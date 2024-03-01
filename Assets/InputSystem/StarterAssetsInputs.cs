@@ -10,9 +10,12 @@ namespace StarterAssets
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
-		public bool jump;
 		public bool sprint;
 
+		[Header("Jumping")] 
+		public bool jump;
+		public float timeOfLastJump;
+		
 		[Header("Movement Settings")]
 		public bool analogMovement;
 
@@ -59,6 +62,7 @@ namespace StarterAssets
 		public void JumpInput(bool newJumpState)
 		{
 			jump = newJumpState;
+			timeOfLastJump = Time.time;
 		}
 
 		public void SprintInput(bool newSprintState)
