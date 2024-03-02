@@ -53,13 +53,16 @@ namespace StarterAssets
         [SerializeField] private float jumpBuffer;
         [SerializeField] private float coyoteTime;
         [SerializeField] private float maxJumpButtonHolding;
-        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump")]
+        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump/  2 == Double Jump")]
         private int lastJumpType = 0;
         private float timeSinceGrounded;
         private bool usedCoyoteTime = false;
         private bool canJump = false;
         private bool startedJump = false;
 
+        [Header("Double Jump")] 
+        private bool usedDoubleJump = false;
+        
         [Header("Walljump")] 
         [SerializeField] private float wallJumpHeight;
         [SerializeField] private float overwriteOfNormalMovementPeriod;
@@ -327,7 +330,6 @@ namespace StarterAssets
                 if (lastJumpType == 1 && _input.move == Vector2.zero) targetDirection = Vector3.zero;
                 _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-                Debug.LogError("Used this");
             }
 
             // update animator if using character
@@ -340,7 +342,6 @@ namespace StarterAssets
 
         private bool CheckCanJump()
         {
-            //Changes lastJumpType back to no type after 0.3 seconds
             //Released Jump Button after jumping
             if (!Grounded && startedJump && !_input.jump) return false;
             
@@ -353,6 +354,13 @@ namespace StarterAssets
             if (startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
             {
                 Jump();
+            }
+            //Double Jump canJump is false after first jump button is released
+             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1)
+            {
+                usedDoubleJump = true;
+                Jump(jumpType:2,overwriteJumpCurve:2);
+                Debug.Log("used double jump");
             }
         }
 
@@ -426,8 +434,8 @@ namespace StarterAssets
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
         }
-
-        private void Jump(bool wallJump = false, int jumpType = 0)
+        
+        private void Jump(bool wallJump = false, int jumpType = 0, float overwriteJumpCurve = 0)
         {
             lastJumpType = jumpType;
             startedJump = true;
@@ -436,6 +444,7 @@ namespace StarterAssets
             currentPosition = Mathf.Clamp01(Time.time - _input.timeOfLastJump);
             float currentJumpHeight = jumpCurveOverTime.Evaluate(currentPosition);
             float usedJumpHeight = wallJump ? wallJumpHeight : currentJumpHeight;
+            usedJumpHeight = overwriteJumpCurve != 0 ? overwriteJumpCurve : usedJumpHeight;
             _verticalVelocity = Mathf.Sqrt(usedJumpHeight * -2f * Gravity);
 
             // update animator if using character
@@ -503,12 +512,12 @@ namespace StarterAssets
             canJump = true;
             startedJump = false;
             onWall = false;
+            usedDoubleJump = false;
             wallJump = false;
         }
         
         private void OnCollisionEnter(Collision collision)
         {
-            Debug.Log("collision with" + collision.gameObject.tag);
             if (!collision.gameObject.tag.Equals("Wall") || onWall) return;
             onWall = true;
             entryVector = Vector3.Reflect(velocity.normalized , collision.impulse.normalized);
