@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
@@ -13,7 +14,7 @@ namespace StarterAssets
 		public bool sprint;
 
 		[Header("Jumping")] 
-		public bool jump;
+		public bool jump = false;
 		public float timeOfLastJump;
 		
 		[Header("Movement Settings")]
@@ -24,6 +25,8 @@ namespace StarterAssets
 		public bool cursorInputForLook = true;
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+		
+
 		public void OnMove(InputValue value)
 		{
 			MoveInput(value.Get<Vector2>());
@@ -61,8 +64,9 @@ namespace StarterAssets
 
 		public void JumpInput(bool newJumpState)
 		{
+			//Set time only one first press
+			if(!jump && newJumpState) timeOfLastJump = Time.time;
 			jump = newJumpState;
-			timeOfLastJump = Time.time;
 		}
 
 		public void SprintInput(bool newSprintState)

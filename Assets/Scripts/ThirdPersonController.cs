@@ -1,5 +1,7 @@
-﻿using Unity.Mathematics;
+﻿using System;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Timeline;
 using Random = UnityEngine.Random;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
@@ -28,14 +30,21 @@ namespace StarterAssets
         public float RotationSmoothTime = 0.12f;
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
-
+        private Vector3 lastPosition;
+        private Vector3 velocity;
+        
         [Header("Audio")] 
         public AudioClip LandingAudioClip;
         public AudioClip[] FootstepAudioClips;
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
-        [Header("Jumping")] [Tooltip("The height the player can jump")]
+        [Header("Jumping")]
+        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump")]
+        private int lastJumpType = 0;
+        private float timeSinceGrounded;
+        [Tooltip("The height the player can jump")]
         public float JumpHeight = 1.2f;
+        [SerializeField] private AnimationCurve jumpCurveOverTime;
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
         public float Gravity = -15.0f;
         [Space(10)]
@@ -45,9 +54,21 @@ namespace StarterAssets
         public float FallTimeout = 0.15f;
         [SerializeField] private float jumpBuffer;
         [SerializeField] private float coyoteTime;
+        [SerializeField] private float maxJumpButtonHolding;
         private bool usedCoyoteTime = false;
-        private bool canJump = false;   
+        private bool canJump = false;
+        private bool startedJump = false;
 
+        [Header("Walljump")] 
+        private Vector3 entryVector;
+        private bool onWall = false;
+        [SerializeField] private float wallJumpHeight;
+        [SerializeField] private float overwriteOfNormalMovementPeriod;
+        [SerializeField] private float wallJumpMultiplier;
+        private float timeLeftWall;
+        private bool wallJump;
+        
+        
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
@@ -153,9 +174,14 @@ namespace StarterAssets
 
         private void Update()
         {
+            velocity = transform.position - lastPosition;
+            lastPosition = transform.position;
             _hasAnimator = TryGetComponent(out _animator);
-
+            
+            canJump = CheckCanJump();
+            CheckWallJump();
             JumpAndGravity();
+            ContinueJump();
             GroundedCheck();
             Move();
         }
@@ -276,8 +302,23 @@ namespace StarterAssets
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            if(wallJump)
+            {
+                entryVector.y = 0;
+                Debug.DrawRay(transform.position,entryVector * (SprintSpeed * wallJumpMultiplier * Time.deltaTime) +
+                                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime,Color.red);
+                _controller.Move(entryVector * (SprintSpeed * wallJumpMultiplier * Time.deltaTime) +
+                                         new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+                
+            }
+            else
+            {
+                //If last jump was walljump momentum goes in other direction
+                if (lastJumpType == 1 && _input.move == Vector2.zero) targetDirection = Vector3.zero;
+                _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+                Debug.LogError("Used this");
+            }
 
             // update animator if using character
             if (_hasAnimator)
@@ -287,9 +328,33 @@ namespace StarterAssets
             }
         }
 
+        private bool CheckCanJump()
+        {
+            //Changes lastJumpType back to no type after 0.3 seconds
+            //Released Jump Button after jumping
+            if (!Grounded && startedJump && !_input.jump) return false;
+            
+            // 
+            return canJump;
+        }
+        private void ContinueJump()
+        {
+            if (startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
+            {
+                Jump();
+            }
+        }
+
         private void JumpAndGravity()
         {
-            if (Grounded)
+            if ((_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer) && onWall)
+            {
+                timeLeftWall = Time.time;
+                wallJump = true;
+                onWall = false;
+                Jump(true, jumpType: 1);
+            }
+            else if (Grounded)
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
@@ -309,17 +374,18 @@ namespace StarterAssets
 
                 // Jump
 
-                if (_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer && canJump)
+                if (_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer &&!startedJump)
                 {
                     Jump();
                 }
             }
+            // Coyote Time
             else if (!Grounded && _input.jump && Time.time - lastTimeGrounded < coyoteTime && !usedCoyoteTime && canJump)
             {
                 Jump();
                 usedCoyoteTime = true;
             }
-            else
+            else 
             {
                 // reset the jump timeout timer
                 _jumpTimeoutDelta = JumpTimeout;
@@ -339,7 +405,7 @@ namespace StarterAssets
                 }
 
                 // if we are not grounded, do not jump
-                _input.jump = false;
+                // _input.jump = false;
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
@@ -349,13 +415,16 @@ namespace StarterAssets
             }
         }
 
-        private void Jump()
+        private void Jump(bool wallJump = false, int jumpType = 0)
         {
-            canJump = false;
-            _input.jump = false;
-            _input.timeOfLastJump = 0;
+            lastJumpType = jumpType;
+            startedJump = true;
             // the square root of H * -2 * G = how much velocity needed to reach desired height
-            _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+            float currentPosition = 0;
+            currentPosition = Mathf.Clamp01(Time.time - _input.timeOfLastJump);
+            float currentJumpHeight = jumpCurveOverTime.Evaluate(currentPosition);
+            float usedJumpHeight = wallJump ? wallJumpHeight : currentJumpHeight;
+            _verticalVelocity = Mathf.Sqrt(usedJumpHeight * -2f * Gravity);
 
             // update animator if using character
             if (_hasAnimator)
@@ -415,8 +484,32 @@ namespace StarterAssets
 
         void TouchedGroundAfterLeaving()
         {
+            timeSinceGrounded = Time.time;
             usedCoyoteTime = false;
             canJump = true;
+            startedJump = false;
+            onWall = false;
+            wallJump = false;
+        }
+        
+        private void OnCollisionEnter(Collision collision)
+        {
+            Debug.Log("collision with" + collision.gameObject.tag);
+            if (!collision.gameObject.tag.Equals("Wall") || onWall) return;
+            onWall = true;
+            entryVector = Vector3.Reflect(velocity.normalized , collision.impulse.normalized);
+            // Debug.DrawRay(transform.position + new Vector3(0,1,0),entryVector);
+            // Debug.DrawRay(transform.position,  50*velocity *-1,Color.cyan);
+            // Debug.DrawRay(transform.position,  newVec,Color.red);
+        }
+
+        private void CheckWallJump()
+        {
+            if (!wallJump) return;
+            if (Time.time - timeLeftWall > overwriteOfNormalMovementPeriod)
+            {
+                wallJump = false;
+            }
         }
     }
 }
