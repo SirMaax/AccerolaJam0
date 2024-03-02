@@ -16,6 +16,9 @@ namespace StarterAssets
 		[Header("Jumping")] 
 		public bool jump = false;
 		public float timeOfLastJump;
+
+		[Header("Special Moves")] 
+		public bool diving;
 		
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -32,6 +35,10 @@ namespace StarterAssets
 			MoveInput(value.Get<Vector2>());
 		}
 
+		public void OnDive(InputValue value)
+		{
+			DiveInput(value.isPressed);
+		}
 		public void OnLook(InputValue value)
 		{
 			if(cursorInputForLook)
@@ -82,6 +89,11 @@ namespace StarterAssets
 		private void SetCursorState(bool newState)
 		{
 			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+		}
+
+		private void DiveInput(bool newState)
+		{
+			diving = newState;
 		}
 	}
 	

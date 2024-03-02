@@ -1,7 +1,9 @@
-﻿using System;
+﻿ using System;
 using Unity.Mathematics;
-using UnityEngine;
-using UnityEngine.Timeline;
+ using UnityEditor.Experimental.GraphView;
+ using UnityEngine;
+ using UnityEngine.Animations;
+ using UnityEngine.Timeline;
 using Random = UnityEngine.Random;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
@@ -39,35 +41,38 @@ namespace StarterAssets
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
         [Header("Jumping")]
-        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump")]
-        private int lastJumpType = 0;
-        private float timeSinceGrounded;
         [Tooltip("The height the player can jump")]
         public float JumpHeight = 1.2f;
-        [SerializeField] private AnimationCurve jumpCurveOverTime;
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
         public float Gravity = -15.0f;
-        [Space(10)]
         [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
         public float JumpTimeout = 0.0f;
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
+        [SerializeField] private AnimationCurve jumpCurveOverTime;
         [SerializeField] private float jumpBuffer;
         [SerializeField] private float coyoteTime;
         [SerializeField] private float maxJumpButtonHolding;
+        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump")]
+        private int lastJumpType = 0;
+        private float timeSinceGrounded;
         private bool usedCoyoteTime = false;
         private bool canJump = false;
         private bool startedJump = false;
 
         [Header("Walljump")] 
-        private Vector3 entryVector;
-        private bool onWall = false;
         [SerializeField] private float wallJumpHeight;
         [SerializeField] private float overwriteOfNormalMovementPeriod;
         [SerializeField] private float wallJumpMultiplier;
+        private Vector3 entryVector;
+        private bool onWall = false;
         private float timeLeftWall;
         private bool wallJump;
-        
+
+        [Header("Diving")] 
+        [SerializeField] private float divingSpeed;
+        private bool isDiving;
+        private Vector3 divingDirection;
         
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -82,19 +87,19 @@ namespace StarterAssets
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
-
         [Tooltip("How far in degrees can you move the camera up")]
         public float TopClamp = 70.0f;
-
         [Tooltip("How far in degrees can you move the camera down")]
         public float BottomClamp = -30.0f;
-
         [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
         public float CameraAngleOverride = 0.0f;
-
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
+        [Header("References")]
+        [Tooltip("Graphics of the player")]
+        [SerializeField] private GameObject gx;
+        
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -118,6 +123,9 @@ namespace StarterAssets
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
 
+        //Gx
+        private Quaternion gxStartRotation;
+        
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         private PlayerInput _playerInput;
 #endif
@@ -164,7 +172,7 @@ namespace StarterAssets
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
-
+            gxStartRotation = gx.transform.rotation;
             AssignAnimationIDs();
 
             // reset our timeouts on start
@@ -179,6 +187,7 @@ namespace StarterAssets
             _hasAnimator = TryGetComponent(out _animator);
             
             canJump = CheckCanJump();
+            Dive();
             CheckWallJump();
             JumpAndGravity();
             ContinueJump();
@@ -247,6 +256,7 @@ namespace StarterAssets
 
         private void Move()
         {
+            if (isDiving) return;
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint || playerIsAlwaysSprinting ? SprintSpeed : MoveSpeed;
 
@@ -339,6 +349,7 @@ namespace StarterAssets
         }
         private void ContinueJump()
         {
+            if (isDiving) return;
             if (startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
             {
                 Jump();
@@ -347,6 +358,7 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
+            if (isDiving) return;
             if ((_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer) && onWall)
             {
                 timeLeftWall = Time.time;
@@ -484,7 +496,9 @@ namespace StarterAssets
 
         void TouchedGroundAfterLeaving()
         {
+            if(isDiving)gx.transform.Rotate(Vector3.right,-90);
             timeSinceGrounded = Time.time;
+            isDiving = false;
             usedCoyoteTime = false;
             canJump = true;
             startedJump = false;
@@ -510,6 +524,54 @@ namespace StarterAssets
             {
                 wallJump = false;
             }
+        }
+
+        private void Dive()
+        {
+            if (_input.diving && CanDive())
+            {
+                _input.diving = false;
+                isDiving = true;
+                divingDirection = _input.move;
+                _verticalVelocity = 0;
+                Vector3 rot = _mainCamera.transform.rotation.eulerAngles;
+                rot.x = 0;
+                Quaternion editedRot = Quaternion.Euler(rot);
+                if (_input.move == Vector2.zero)divingDirection = transform.forward;
+                else divingDirection =  editedRot * new Vector3(_input.move.x, 0, _input.move.y);
+                
+                wallJump = false;
+
+                //turn in that diretion
+                LookInDiretion(divingDirection);
+            }
+
+            if (!isDiving) return;
+            _controller.Move(divingSpeed * Time.deltaTime * divingDirection
+                             + new Vector3(0,_verticalVelocity,0) * Time.deltaTime);
+            if (_verticalVelocity < _terminalVelocity)
+            {
+                _verticalVelocity += Gravity * Time.deltaTime;
+            }
+        }
+
+        private bool CanDive()
+        {
+            return !Grounded && !isDiving;
+        }
+
+        private void LookInDiretion(Vector3 lookDirection)
+        {
+            _targetRotation = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg +
+                              _mainCamera.transform.eulerAngles.y;
+            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                RotationSmoothTime);
+
+            // rotate to face input direction relative to camera position
+            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            
+            
+            gx.transform.Rotate(Vector3.right,90);
         }
     }
 }
