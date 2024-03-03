@@ -20,10 +20,14 @@ namespace StarterAssets
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        [Header("Test")] [SerializeField] private float test;
+        
         [Header("Settings")] 
         [SerializeField] private bool playerIsAlwaysSprinting;
+        [SerializeField] private bool canUseDoubleJump;
 
         [Header("Player")] 
+        public float velocity;
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
         [Tooltip("Sprint speed of the character in m/s")]
@@ -33,7 +37,15 @@ namespace StarterAssets
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
         private Vector3 lastPosition;
-        private Vector3 velocity;
+        private Vector3 velocityVector;
+        private float timeStartedMovement;
+        
+        
+        [Header("AccelSpeed")]
+        [SerializeField] private AnimationCurve MovementSpeed;
+        [SerializeField] public  float requiredAccelerationSpeed;
+        [SerializeField] float currentAccelerationTime = 0;
+        private bool hasFullyAccelerated = false;
         
         [Header("Audio")] 
         public AudioClip LandingAudioClip;
@@ -185,7 +197,11 @@ namespace StarterAssets
 
         private void Update()
         {
-            velocity = transform.position - lastPosition;
+            Vector3 speed = _controller.velocity;
+            speed.y = 0;
+            velocity = speed.magnitude;
+            
+            velocityVector = transform.position - lastPosition;
             lastPosition = transform.position;
             _hasAnimator = TryGetComponent(out _animator);
             
@@ -195,6 +211,7 @@ namespace StarterAssets
             JumpAndGravity();
             ContinueJump();
             GroundedCheck();
+            Accleration();
             Move();
         }
 
@@ -223,7 +240,7 @@ namespace StarterAssets
             if (Grounded)
             {
                 lastTimeGrounded = Time.time;
-                if (!groundStatusBeforeCheck) TouchedGroundAfterLeaving();
+                if (!groundStatusBeforeCheck) FirstGroundTouch();
             }
             
 
@@ -260,9 +277,10 @@ namespace StarterAssets
         private void Move()
         {
             if (isDiving) return;
+            
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint || playerIsAlwaysSprinting ? SprintSpeed : MoveSpeed;
-
+            // float targetSpeed = _input.sprint || playerIsAlwaysSprinting ? SprintSpeed : MoveSpeed;
+            float targetSpeed = MovementSpeed.Evaluate(currentAccelerationTime);
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
@@ -279,10 +297,11 @@ namespace StarterAssets
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
             {
+                float newspeedChangeRate = currentHorizontalSpeed > targetSpeed ? 6 : SpeedChangeRate;
                 // creates curved result rather than a linear one giving a more organic speed change
                 // note T in Lerp is clamped, so we don't need to clamp our speed
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                    Time.deltaTime * SpeedChangeRate);
+                    Time.deltaTime * newspeedChangeRate);
 
                 // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
@@ -295,9 +314,9 @@ namespace StarterAssets
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
-            // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-
+            // Reduce control in air
+            Vector3 inputDirection= new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
@@ -310,8 +329,7 @@ namespace StarterAssets
                 // rotate to face input direction relative to camera position
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
-
-
+            
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
@@ -340,6 +358,18 @@ namespace StarterAssets
             }
         }
 
+        private void Accleration()
+        {
+            
+            // _input.move == Vector2.zero ||
+            if ( velocity < requiredAccelerationSpeed && hasFullyAccelerated && !onWall)
+            {
+                currentAccelerationTime = 0;
+                hasFullyAccelerated = false;
+            }
+            else if (velocity > requiredAccelerationSpeed && !hasFullyAccelerated) hasFullyAccelerated = true;
+            else if(Grounded && _input.move !=Vector2.zero) currentAccelerationTime += Time.deltaTime;
+        }
         private bool CheckCanJump()
         {
             //Released Jump Button after jumping
@@ -348,6 +378,7 @@ namespace StarterAssets
             // 
             return canJump;
         }
+        
         private void ContinueJump()
         {
             if (isDiving) return;
@@ -356,11 +387,10 @@ namespace StarterAssets
                 Jump();
             }
             //Double Jump canJump is false after first jump button is released
-             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1)
+             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump)
             {
                 usedDoubleJump = true;
                 Jump(jumpType:2,overwriteJumpCurve:2);
-                Debug.Log("used double jump");
             }
         }
 
@@ -503,9 +533,10 @@ namespace StarterAssets
             }
         }
 
-        void TouchedGroundAfterLeaving()
+        void FirstGroundTouch()
         {
             if(isDiving)gx.transform.Rotate(Vector3.right,-90);
+            // if(lastJumpType==1)
             timeSinceGrounded = Time.time;
             isDiving = false;
             usedCoyoteTime = false;
@@ -520,10 +551,11 @@ namespace StarterAssets
         {
             if (!collision.gameObject.tag.Equals("Wall") || onWall) return;
             onWall = true;
-            entryVector = Vector3.Reflect(velocity.normalized , collision.impulse.normalized);
-            // Debug.DrawRay(transform.position + new Vector3(0,1,0),entryVector);
-            // Debug.DrawRay(transform.position,  50*velocity *-1,Color.cyan);
-            // Debug.DrawRay(transform.position,  newVec,Color.red);
+            entryVector = Vector3.Reflect(velocityVector.normalized , collision.impulse.normalized);
+            Debug.LogError("Drawing Stuff");
+            Debug.DrawRay(transform.position + new Vector3(0,1,0),entryVector);
+            Debug.DrawRay(transform.position,  50* velocityVector *-1,Color.cyan);
+            Debug.DrawRay(transform.position,  entryVector,Color.red);
         }
 
         private void CheckWallJump()

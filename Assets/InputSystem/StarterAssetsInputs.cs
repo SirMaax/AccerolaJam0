@@ -12,7 +12,9 @@ namespace StarterAssets
 		public Vector2 move;
 		public Vector2 look;
 		public bool sprint;
-
+		[Tooltip("If the input direction was changed in the opposite direction instantly")]
+		public bool movedOppositeDirection;
+		
 		[Header("Jumping")] 
 		public bool jump = false;
 		public float timeOfLastJump;
@@ -33,6 +35,7 @@ namespace StarterAssets
 		public void OnMove(InputValue value)
 		{
 			MoveInput(value.Get<Vector2>());
+			
 		}
 
 		public void OnDive(InputValue value)
@@ -61,7 +64,9 @@ namespace StarterAssets
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{
+			if (Vector2.Dot(newMoveDirection, move) < -0.8) movedOppositeDirection = true;
 			move = newMoveDirection;
+			
 		} 
 
 		public void LookInput(Vector2 newLookDirection)
