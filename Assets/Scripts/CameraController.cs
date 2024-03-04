@@ -7,7 +7,10 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     // Start is called before the first frame update
+
+
     [Header("Status")] 
+    [SerializeField] private bool cameraChangActive;
     private float requiredSpeedForChange;
     
     [Header("References")]
@@ -24,8 +27,12 @@ public class CameraController : MonoBehaviour
     }
 
     // Update is called once per frame
+
+#if  cameraChangActive
+    
     void Update()
     {
+        
         Vector3 velocity = _controller.velocity;
         velocity.y = 0;
         if (velocity.magnitude > requiredSpeedForChange)
@@ -39,4 +46,5 @@ public class CameraController : MonoBehaviour
             _farCamera.gameObject.SetActive(true);
         }
     }
+#endif
 }

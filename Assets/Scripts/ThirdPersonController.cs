@@ -1,8 +1,11 @@
 ﻿ using System;
-using Unity.Mathematics;
+ using System.Collections;
+ using System.Collections.Generic;
+ using Unity.Mathematics;
  using UnityEditor.Experimental.GraphView;
  using UnityEngine;
  using UnityEngine.Animations;
+ using UnityEngine.PlayerLoop;
  using UnityEngine.Timeline;
 using Random = UnityEngine.Random;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
@@ -25,7 +28,11 @@ namespace StarterAssets
         [Header("Settings")] 
         [SerializeField] private bool playerIsAlwaysSprinting;
         [SerializeField] private bool canUseDoubleJump;
-
+        [SerializeField] private bool canJumpHigherByHolding;
+        [SerializeField] private bool canHoldDownSpaceForJumping;
+        [SerializeField] bool printOutJumpCombo;
+        
+        
         [Header("Player")] 
         public float velocity;
         [Tooltip("Move speed of the character in m/s")]
@@ -36,8 +43,11 @@ namespace StarterAssets
         public float RotationSmoothTime = 0.12f;
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
+        //influecne from outside
+        public Vector3 outsideMovement;
+        //
+        public Vector3 velocityVector;
         private Vector3 lastPosition;
-        private Vector3 velocityVector;
         private float timeStartedMovement;
         
         
@@ -61,26 +71,38 @@ namespace StarterAssets
         public float JumpTimeout = 0.0f;
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
+        [Tooltip("The additional multiplier speed the player has during the jump")]
+        [SerializeField] private float[] jumpSpeedMultiplier; 
         [SerializeField] private AnimationCurve jumpCurveOverTime;
         [SerializeField] private float jumpBuffer;
         [SerializeField] private float coyoteTime;
         [SerializeField] private float maxJumpButtonHolding;
-        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump/  2 == Double Jump")]
+        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump/  2 == Double Jump / 3 == Continued Jump")]
         private int lastJumpType = 0;
-        private float timeSinceGrounded;
+        
+        //The last time when the player had his initial jump
+        private float timeOffInitialJump = 0;
         private bool usedCoyoteTime = false;
         private bool canJump = false;
         private bool startedJump = false;
 
         [Header("Double Jump")] 
         private bool usedDoubleJump = false;
+
+        [Header("Jump combo")]
+        [SerializeField] private float timingForJumpCombo;
+        [SerializeField] private List<float> jumpMultiplier;
+        public int currentJumpIndex;
         
+       
         [Header("Walljump")] 
         [SerializeField] private float wallJumpHeight;
+        [Tooltip("Not really the angle just the distance direction the player is going up")]
+        [SerializeField] public float wallJumpAngle;
         [SerializeField] private float overwriteOfNormalMovementPeriod;
         [SerializeField] private float wallJumpMultiplier;
-        private Vector3 entryVector;
-        private bool onWall = false;
+        public bool onWall = false;
+        public Vector3 entryVector;
         private float timeLeftWall;
         private bool wallJump;
 
@@ -97,8 +119,13 @@ namespace StarterAssets
         public float GroundedRadius = 0.28f;
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
+        //Is continiously set if playerIsStill touching ground. When leaving like jumping from plattform this will be the time when player last touched ground
         private float lastTimeGrounded;
-
+        //The time when the player ground itself again after leaving. Is only set on the first ground touch
+        private float timeSinceGrounded;
+        //If the player left the ground by jumping or falling.
+        private bool leftGroundByJumping;
+        
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
@@ -145,7 +172,7 @@ namespace StarterAssets
         private PlayerInput _playerInput;
 #endif
         private Animator _animator;
-        private CharacterController _controller;
+        [HideInInspector]public CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
 
@@ -210,9 +237,13 @@ namespace StarterAssets
             CheckWallJump();
             JumpAndGravity();
             ContinueJump();
-            GroundedCheck();
             Accleration();
             Move();
+        }
+
+        private void FixedUpdate()
+        {
+            GroundedCheck();
         }
 
         private void LateUpdate()
@@ -231,21 +262,21 @@ namespace StarterAssets
 
         private void GroundedCheck()
         {
+            if (Time.time - timeOffInitialJump < 0.1f) return;
             // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
                 transform.position.z);
             bool groundStatusBeforeCheck = Grounded;
-            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
-                QueryTriggerInteraction.Ignore);
+            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers);
+            Collider[] colliders = Physics.OverlapSphere(spherePosition, GroundedRadius, GroundLayers);
+            if (colliders.Length > 0) Grounded = true;
             if (Grounded)
             {
                 lastTimeGrounded = Time.time;
                 if (!groundStatusBeforeCheck) FirstGroundTouch();
             }
-            
 
-            DebugExtension.DebugWireSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset,
-                transform.position.z), GroundedRadius);
+
             // update animator if using character
             if (_hasAnimator)
             {
@@ -277,7 +308,7 @@ namespace StarterAssets
         private void Move()
         {
             if (isDiving) return;
-            
+            if (Grounded) _verticalVelocity = -2f;
             // set target speed based on move speed, sprint speed and if sprint is pressed
             // float targetSpeed = _input.sprint || playerIsAlwaysSprinting ? SprintSpeed : MoveSpeed;
             float targetSpeed = MovementSpeed.Evaluate(currentAccelerationTime);
@@ -287,7 +318,10 @@ namespace StarterAssets
             // if there is no input, set the target speed to 0
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-            // a reference to the players current horizontal velocity
+            float localJumpSpeedMultiplier = leftGroundByJumping ? jumpSpeedMultiplier[currentJumpIndex] : 1;
+            targetSpeed *= localJumpSpeedMultiplier;
+            
+            // a reference o the players current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
@@ -332,9 +366,9 @@ namespace StarterAssets
             
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
-            // move the player
             if(wallJump)
             {
+                //Walljump
                 entryVector.y = 0;
                 Debug.DrawRay(transform.position,entryVector * (SprintSpeed * wallJumpMultiplier * Time.deltaTime) +
                                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime,Color.red);
@@ -348,6 +382,7 @@ namespace StarterAssets
                 if (lastJumpType == 1 && _input.move == Vector2.zero) targetDirection = Vector3.zero;
                 _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+                // transform.Translate(outsideMovement);
             }
 
             // update animator if using character
@@ -360,12 +395,15 @@ namespace StarterAssets
 
         private void Accleration()
         {
-            
             // _input.move == Vector2.zero ||
-            if ( velocity < requiredAccelerationSpeed && hasFullyAccelerated && !onWall)
+            if ( velocity < requiredAccelerationSpeed && hasFullyAccelerated && !onWall )
             {
-                currentAccelerationTime = 0;
-                hasFullyAccelerated = false;
+                if(!Grounded)currentAccelerationTime -= Time.deltaTime;
+                else
+                {
+                    currentAccelerationTime = 0;
+                    hasFullyAccelerated = false;
+                }
             }
             else if (velocity > requiredAccelerationSpeed && !hasFullyAccelerated) hasFullyAccelerated = true;
             else if(Grounded && _input.move !=Vector2.zero) currentAccelerationTime += Time.deltaTime;
@@ -381,10 +419,10 @@ namespace StarterAssets
         
         private void ContinueJump()
         {
-            if (isDiving) return;
+            if (isDiving || !canJumpHigherByHolding || currentJumpIndex >= 1 ) return;
             if (startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
             {
-                Jump();
+                Jump(jumpType: 2);
             }
             //Double Jump canJump is false after first jump button is released
              else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump)
@@ -397,8 +435,10 @@ namespace StarterAssets
         private void JumpAndGravity()
         {
             if (isDiving) return;
-            if ((_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer) && onWall)
+            if ((_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer) && onWall 
+                && _input.HasReleasedJumpButtonSinceLastJump(lastTimeGrounded) && _input.timeHeldJumpButton < jumpBuffer)
             {
+            //Walljump
                 timeLeftWall = Time.time;
                 wallJump = true;
                 onWall = false;
@@ -423,10 +463,10 @@ namespace StarterAssets
                 }
 
                 // Jump
-
                 if (_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer &&!startedJump)
                 {
-                    Jump();
+                    
+                    Jump(initialJump: true,jumpBufferWasUsed:Time.time - _input.timeOfLastJump <= jumpBuffer);
                 }
             }
             // Coyote Time
@@ -464,19 +504,33 @@ namespace StarterAssets
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
         }
-        
-        private void Jump(bool wallJump = false, int jumpType = 0, float overwriteJumpCurve = 0)
+        /// <summary>
+        /// Handles the actual execution of the jump
+        /// </summary>
+        /// <param name="wallJump"> If this jump is a walljump. Because different forces are then applied</param>
+        /// <param name="jumpType"> Which jump tpye = 0 normal // 1 = walljump // 2 = double jump // 3 = continued jump</param>
+        /// <param name="overwriteJumpCurve"> if yes a custom jump value can be given for this jump</param>
+        /// <param name="initialJump"> If this is the first jump of the ground. Is used for handling the jump combo</param>
+        private void Jump(bool wallJump = false, int jumpType = 0, float overwriteJumpCurve = 0, 
+            bool initialJump = false, bool jumpBufferWasUsed = false)
         {
+            if (!canHoldDownSpaceForJumping 
+                && (!_input.HasPlayerReleasedJumpButtonSinceLastPress(lastTimeGrounded) && !jumpBufferWasUsed)
+                && initialJump) return;
+            if(initialJump)HandleJumpCombo();
+            
             lastJumpType = jumpType;
             startedJump = true;
             // the square root of H * -2 * G = how much velocity needed to reach desired height
             float currentPosition = 0;
             currentPosition = Mathf.Clamp01(Time.time - _input.timeOfLastJump);
             float currentJumpHeight = jumpCurveOverTime.Evaluate(currentPosition);
+            
             float usedJumpHeight = wallJump ? wallJumpHeight : currentJumpHeight;
             usedJumpHeight = overwriteJumpCurve != 0 ? overwriteJumpCurve : usedJumpHeight;
-            _verticalVelocity = Mathf.Sqrt(usedJumpHeight * -2f * Gravity);
-
+            
+            float jumpComboMultiplier = jumpMultiplier[currentJumpIndex];
+            _verticalVelocity = Mathf.Sqrt(usedJumpHeight * jumpComboMultiplier * -2f * Gravity);
             // update animator if using character
             if (_hasAnimator)
             {
@@ -487,6 +541,36 @@ namespace StarterAssets
             if (_jumpTimeoutDelta >= 0.0f)
             {
                 _jumpTimeoutDelta -= Time.deltaTime;
+            }
+
+        }
+        /// <summary>
+        /// Handles the jump combo aswell as checks which are down after leaving the ground by jumping the first time
+        /// </summary>
+        private void HandleJumpCombo()
+        {
+            timeOffInitialJump = Time.time;
+            Grounded = false;
+            leftGroundByJumping = true;
+            //After on complete combo reset
+            if (currentJumpIndex == jumpMultiplier.Count - 1)
+            {
+                currentJumpIndex = 0;
+                return;
+            }
+            float usedTime = _input.timeOfLastJump;
+            if (usedTime < timeSinceGrounded + timingForJumpCombo && usedTime > timeSinceGrounded - timingForJumpCombo)
+            {
+                //Player got right timing
+                currentJumpIndex += 1;
+                currentJumpIndex = Math.Clamp(currentJumpIndex, 0, jumpMultiplier.Count - 1);
+                if(printOutJumpCombo)Debug.Log("succeded to " + currentJumpIndex); 
+                
+            }
+            else
+            {
+                currentJumpIndex = 0;
+                if(printOutJumpCombo)Debug.Log("failed");
             }
         }
 
@@ -545,19 +629,22 @@ namespace StarterAssets
             onWall = false;
             usedDoubleJump = false;
             wallJump = false;
+            leftGroundByJumping = false;
         }
         
-        private void OnCollisionEnter(Collision collision)
-        {
-            if (!collision.gameObject.tag.Equals("Wall") || onWall) return;
-            onWall = true;
-            entryVector = Vector3.Reflect(velocityVector.normalized , collision.impulse.normalized);
-            Debug.LogError("Drawing Stuff");
-            Debug.DrawRay(transform.position + new Vector3(0,1,0),entryVector);
-            Debug.DrawRay(transform.position,  50* velocityVector *-1,Color.cyan);
-            Debug.DrawRay(transform.position,  entryVector,Color.red);
-        }
 
+
+    //     private void CheckWall()
+    //     {
+    //         bool previousOnWall = onWall;
+    //         onWall = Physics.CheckSphere(transform.position, wallRadiusCheck, wallLayerMask);
+    //         if (!onWall && onWall)
+    //         {
+    //             
+    //         }
+    //     
+    // }
+    //     
         private void CheckWallJump()
         {
             if (!wallJump) return;
@@ -615,4 +702,5 @@ namespace StarterAssets
             gx.transform.Rotate(Vector3.right,90);
         }
     }
+    
 }

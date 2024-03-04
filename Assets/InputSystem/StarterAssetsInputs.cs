@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
@@ -17,8 +18,10 @@ namespace StarterAssets
 		
 		[Header("Jumping")] 
 		public bool jump = false;
-		public float timeOfLastJump;
-
+		public float timeOfLastJump = -1;
+		private float timeOfLastLastJump;
+		private float timeOfLastRelease;
+		public float timeHeldJumpButton;
 		[Header("Special Moves")] 
 		public bool diving;
 		
@@ -30,7 +33,16 @@ namespace StarterAssets
 		public bool cursorInputForLook = true;
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-		
+
+		private void Start()
+		{
+			timeOfLastJump = -1;
+		}
+
+		private void Update()
+		{
+			if (jump) timeHeldJumpButton += Time.deltaTime;
+		}
 
 		public void OnMove(InputValue value)
 		{
@@ -77,10 +89,31 @@ namespace StarterAssets
 		public void JumpInput(bool newJumpState)
 		{
 			//Set time only one first press
-			if(!jump && newJumpState) timeOfLastJump = Time.time;
+			if (!jump && newJumpState )
+			{
+				timeOfLastLastJump = timeOfLastJump;
+				timeOfLastJump = Time.time;
+				
+			}
 			jump = newJumpState;
+			if (!jump)
+			{
+				timeOfLastRelease = Time.time;
+				timeHeldJumpButton = 0;
+			}
 		}
 
+		public bool HasPlayerReleasedJumpButtonSinceLastPress(float lastTimeGrounded)
+		{
+			return timeOfLastLastJump <= timeOfLastRelease && timeOfLastRelease <= timeOfLastJump &&
+			       timeOfLastLastJump <= lastTimeGrounded && lastTimeGrounded <= timeOfLastJump;
+		}
+
+		public bool HasReleasedJumpButtonSinceLastJump(float lastTimeGrounded)
+		{
+			return lastTimeGrounded <= timeOfLastRelease;
+		}	
+		
 		public void SprintInput(bool newSprintState)
 		{
 			sprint = newSprintState;
