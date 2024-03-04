@@ -43,9 +43,6 @@ namespace StarterAssets
         public float RotationSmoothTime = 0.12f;
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
-        //influecne from outside
-        public Vector3 outsideMovement;
-        //
         public Vector3 velocityVector;
         private Vector3 lastPosition;
         private float timeStartedMovement;
