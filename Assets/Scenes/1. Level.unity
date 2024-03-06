@@ -1468,7 +1468,7 @@ PrefabInstance:
     - target: {fileID: 4365484223133825744, guid: f5fb460f9bb8c3f41af8d3e964988af1,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4365484223133825745, guid: f5fb460f9bb8c3f41af8d3e964988af1,
         type: 3}
@@ -5478,7 +5478,7 @@ PrefabInstance:
     - target: {fileID: 4389168719837776585, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 61.059998
+      value: 64.21
       objectReference: {fileID: 0}
     - target: {fileID: 4725752168392142812, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -5500,6 +5500,16 @@ PrefabInstance:
       propertyPath: folderForToxicTrails
       value: 
       objectReference: {fileID: 968582651}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[5]
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6662152922277665246, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: m_Lens.m_SensorSize.x

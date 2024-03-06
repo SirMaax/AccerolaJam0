@@ -24,6 +24,5 @@ public class WallCheck : MonoBehaviour
         Debug.LogError("Drawing Stuff");
         Debug.Log(_controller.entryVector);
         _controller.touchedWall = collision.gameObject;
-        Debug.Log(_controller.touchedWall);
     }
 }

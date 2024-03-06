@@ -25,9 +25,14 @@ public class CorruptAbilities : MonoBehaviour
     [SerializeField] private GameObject folderForToxicTrails;
     [SerializeField] private Transform spawnPosition;
     private float lastSpawnTime;
-    
     private bool speedCorruptActive;
     private float timeSpeedCorruptWasActivated;
+
+    [Header("JumpCombo")] 
+    [SerializeField]private double decayFactor = 0.9f;
+    private int jumpComboTimesUsed= 0;
+
+    
     
     [Header("References")]
     //Hierarchy needs to stay the same
@@ -42,6 +47,7 @@ public class CorruptAbilities : MonoBehaviour
         diveLimitUse,
         wallJump,
         movement,
+        jumpCombo,
     }
     
     
@@ -138,5 +144,14 @@ public class CorruptAbilities : MonoBehaviour
                 Quaternion.identity, folderForToxicTrails.transform);
         }
     }
-    
+    /// <summary>
+    /// The more it is used the less powerful it becomes
+    /// </summary>
+    /// <returns>1 if nothing is changed else the jumpower for the jump</returns>
+    public float JumpCombo(int currentJumpIndex)
+    {
+        if (!isCorrupted[(int)ECorruptedAbilities.jumpCombo]) return 1;
+        if(currentJumpIndex == 2) timesUsed += 1;
+        return (float) Math.Pow(decayFactor,timesUsed);
+    }
 }

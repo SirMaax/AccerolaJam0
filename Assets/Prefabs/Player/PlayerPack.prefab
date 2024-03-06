@@ -445,6 +445,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: decayFactor
+      value: 0.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: _soundManager
       value: 
       objectReference: {fileID: 9108375221450597009}

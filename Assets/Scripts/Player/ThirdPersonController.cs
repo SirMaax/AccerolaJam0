@@ -441,7 +441,6 @@ namespace StarterAssets
             {
             //Walljump
                 onWall = false;
-                Debug.Log("wall" + touchedWall);
                 if (_corruptAbilities.WallJump(touchedWall)) return;
                 timeLeftWall = Time.time;
                 wallJump = true;
@@ -533,7 +532,10 @@ namespace StarterAssets
             float usedJumpHeight = wallJump ? wallJumpHeight : currentJumpHeight;
             usedJumpHeight = overwriteJumpCurve != 0 ? overwriteJumpCurve : usedJumpHeight;
             
+            
             float jumpComboMultiplier = jumpMultiplier[currentJumpIndex];
+            //Corruption modifier
+            jumpComboMultiplier *= currentJumpIndex > 1 ? _corruptAbilities.JumpCombo(currentJumpIndex) : 1;
             _verticalVelocity = Mathf.Sqrt(usedJumpHeight * jumpComboMultiplier * -2f * Gravity);
             // update animator if using character
             if (_hasAnimator)
