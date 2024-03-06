@@ -74,7 +74,7 @@ namespace StarterAssets
         [SerializeField] private float jumpBuffer;
         [SerializeField] private float coyoteTime;
         [SerializeField] private float maxJumpButtonHolding;
-        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump/  2 == Double Jump / 3 == Continued Jump")]
+        [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump/  2 == Double Jump / 3 == Continued Jump / 4 == Other")]
         private int lastJumpType = 0;
         
         //The last time when the player had his initial jump
@@ -108,6 +108,14 @@ namespace StarterAssets
         [SerializeField] private float divingSpeed;
         private bool isDiving;
         private Vector3 divingDirection;
+
+        [Header("BackFlip")] 
+        [SerializeField] private float backFlipHeight;
+        [SerializeField] private float backFlipDuration;
+        [SerializeField] private float backFlipBackwardsMovement;
+        [SerializeField] float backFlipRotateSpeed;
+        private float startBackFlip;
+        private bool isBackFlipping;
         
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -235,6 +243,7 @@ namespace StarterAssets
             
             canJump = CheckCanJump();
             Dive();
+            BackFlip();
             CheckWallJump();
             JumpAndGravity();
             ContinueJump();
@@ -375,7 +384,13 @@ namespace StarterAssets
                                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime,Color.red);
                 _controller.Move(entryVector * (SprintSpeed * wallJumpMultiplier * Time.deltaTime) +
                                          new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-                
+            }
+            else if (isBackFlipping)
+            {
+                Vector3 backFlipDirection = new Vector3(0, 0, -1);
+                backFlipDirection = transform.rotation * backFlipDirection;
+                _controller.Move(backFlipDirection * backFlipBackwardsMovement * Time.deltaTime +
+                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
             else
             {
@@ -420,7 +435,8 @@ namespace StarterAssets
         
         private void ContinueJump()
         {
-            if (isDiving || !canJumpHigherByHolding || currentJumpIndex >= 1 ) return;
+            if(CanPlayerJump())
+            if(!canJumpHigherByHolding || currentJumpIndex >= 1 ) return;
             if (startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
             {
                 Jump(jumpType: 2);
@@ -435,7 +451,7 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            if (isDiving) return;
+            if (!CanPlayerJump()) return;
             if ((_input.jump || Time.time - _input.timeOfLastJump <= jumpBuffer) && onWall 
                 && _input.HasReleasedJumpButtonSinceLastJump(lastTimeGrounded) && _input.timeHeldJumpButton < jumpBuffer)
             {
@@ -514,9 +530,9 @@ namespace StarterAssets
         /// <param name="overwriteJumpCurve"> if yes a custom jump value can be given for this jump</param>
         /// <param name="initialJump"> If this is the first jump of the ground. Is used for handling the jump combo</param>
         private void Jump(bool wallJump = false, int jumpType = 0, float overwriteJumpCurve = 0, 
-            bool initialJump = false, bool jumpBufferWasUsed = false)
+            bool initialJump = false, bool jumpBufferWasUsed = false, bool applyCorrupt = true, bool useJumpHeightMulitplier = true)
         {
-            if (_corruptAbilities.CorruptJump()) return;
+            if (_corruptAbilities.CorruptJump() && applyCorrupt) return;
             if (!canHoldDownSpaceForJumping 
                 && (!_input.HasPlayerReleasedJumpButtonSinceLastPress(lastTimeGrounded) && !jumpBufferWasUsed)
                 && initialJump) return;
@@ -626,6 +642,7 @@ namespace StarterAssets
         void FirstGroundTouch()
         {
             if(isDiving)gx.transform.Rotate(Vector3.right,-90);
+            if(isBackFlipping)ResetGxRotation();
             // if(lastJumpType==1)
             timeSinceGrounded = Time.time;
             isDiving = false;
@@ -697,6 +714,7 @@ namespace StarterAssets
 
         private void LookInDiretion(Vector3 lookDirection)
         {
+            if (isBackFlipping) return;
             _targetRotation = Mathf.Atan2(lookDirection.x, lookDirection.z) * Mathf.Rad2Deg +
                               _mainCamera.transform.eulerAngles.y;
             float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
@@ -707,6 +725,39 @@ namespace StarterAssets
             
             
             gx.transform.Rotate(Vector3.right,90);
+        }
+
+        private void BackFlip()
+        {
+            if (isBackFlipping)
+            {
+                if (Time.time - startBackFlip >= backFlipDuration)
+                {
+                    isBackFlipping = false;
+                    ResetGxRotation();
+                }
+                //Rotate
+                Vector3 direction = new Vector3(-1, 0,0 );
+                direction = transform.rotation * direction;
+                gx.transform.Rotate(direction,backFlipRotateSpeed * Time.deltaTime);
+                return;
+            }
+            if (!_input.backFlip  || !Grounded || isDiving) return;
+            isBackFlipping = true;
+            _input.backFlip = false;
+            startBackFlip = Time.time;
+            Grounded = false;
+            Jump(jumpType:4,overwriteJumpCurve:backFlipHeight,applyCorrupt:false,useJumpHeightMulitplier:false);
+        }
+
+        private bool CanPlayerJump()
+        {
+            return !isDiving || !isBackFlipping;
+        }
+
+        private void ResetGxRotation()
+        {
+            gx.transform.rotation = gxStartRotation;
         }
     }
     

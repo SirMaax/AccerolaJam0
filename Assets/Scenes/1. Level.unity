@@ -5478,7 +5478,7 @@ PrefabInstance:
     - target: {fileID: 4389168719837776585, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 64.21
+      value: 61.059998
       objectReference: {fileID: 0}
     - target: {fileID: 4725752168392142812, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -5504,6 +5504,11 @@ PrefabInstance:
         type: 3}
       propertyPath: isCorrupted.Array.size
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[4]
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -5672,8 +5677,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
+      propertyPath: backFlipHeight
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: backFlipDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: backFlipRotateSpeed
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
       propertyPath: canJumpHigherByHolding
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: backFlipBackwardsMovement
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}

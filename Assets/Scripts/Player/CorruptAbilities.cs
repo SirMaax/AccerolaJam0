@@ -121,7 +121,8 @@ public class CorruptAbilities : MonoBehaviour
     }
     
     /// <summary>
-    /// 
+    /// Places puddles of slime on the ground when movement speed is over a certain border.
+    /// Hurts the player to walk on them.
     /// </summary>
     /// <param name="speed"></param>
     public void CorruptedMovement(float speed, bool grounded)
@@ -145,7 +146,7 @@ public class CorruptAbilities : MonoBehaviour
         }
     }
     /// <summary>
-    /// The more it is used the less powerful it becomes
+    /// The more it is used the less powerful it becomes. Each time decayFActor is multiplied more times
     /// </summary>
     /// <returns>1 if nothing is changed else the jumpower for the jump</returns>
     public float JumpCombo(int currentJumpIndex)

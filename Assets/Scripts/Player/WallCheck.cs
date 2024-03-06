@@ -6,10 +6,12 @@ using UnityEngine;
 public class WallCheck : MonoBehaviour
 {
     [SerializeField] private ThirdPersonController _controller;
+    
     [SerializeField] private LayerMask _layerMask;
     
     private void OnCollisionEnter(Collision collision)
     {
+        if (_controller.Grounded) return;
         int thisLayerMask = 1 << collision.gameObject.layer;
         if ((thisLayerMask & _layerMask) == 0 || _controller.onWall) return;
         // if (!collision.gameObject.tag.Equals("Wall") || _controller.onWall) return;

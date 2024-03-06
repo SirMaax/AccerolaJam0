@@ -22,8 +22,10 @@ namespace StarterAssets
 		private float timeOfLastLastJump;
 		private float timeOfLastRelease;
 		public float timeHeldJumpButton;
+		
 		[Header("Special Moves")] 
 		public bool diving;
+		public bool backFlip;
 		
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -70,6 +72,11 @@ namespace StarterAssets
 		public void OnSprint(InputValue value)
 		{
 			SprintInput(value.isPressed);
+		}
+
+		public void OnBackFlip(InputValue value)
+		{
+			BackFlipInput(value.isPressed);	
 		}
 #endif
 
@@ -132,6 +139,11 @@ namespace StarterAssets
 		private void DiveInput(bool newState)
 		{
 			diving = newState;
+		}
+
+		private void BackFlipInput(bool newstate)
+		{
+			backFlip = newstate;
 		}
 	}
 	
