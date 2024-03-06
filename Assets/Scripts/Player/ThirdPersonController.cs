@@ -177,6 +177,10 @@ namespace StarterAssets
         //Gx
         private Quaternion gxStartRotation;
         
+        //sound
+        private LocalSoundManager _soundManager; 
+
+        
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         private PlayerInput _playerInput;
 #endif
@@ -214,7 +218,7 @@ namespace StarterAssets
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-
+            _soundManager = transform.parent.GetComponentInChildren<LocalSoundManager>();
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
@@ -641,8 +645,7 @@ namespace StarterAssets
 
         void FirstGroundTouch()
         {
-            if(isDiving)gx.transform.Rotate(Vector3.right,-90);
-            if(isBackFlipping)ResetGxRotation();
+            if(isDiving|| isBackFlipping)ResetGxRotation();
             // if(lastJumpType==1)
             timeSinceGrounded = Time.time;
             isDiving = false;
@@ -709,7 +712,9 @@ namespace StarterAssets
 
         private bool CanDive()
         {
-            return !Grounded && !isDiving;
+            bool backFlipping = !(_corruptAbilities.BackFlip() == 2 && isBackFlipping);
+            if (backFlipping)_soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
+            return !Grounded && !isDiving && backFlipping;
         }
 
         private void LookInDiretion(Vector3 lookDirection)
@@ -742,7 +747,13 @@ namespace StarterAssets
                 gx.transform.Rotate(direction,backFlipRotateSpeed * Time.deltaTime);
                 return;
             }
-            if (!_input.backFlip  || !Grounded || isDiving) return;
+            if (!_input.backFlip  || !Grounded || isDiving)
+            {
+                _input.backFlip = false;
+                return;
+            }
+            float newTime = _corruptAbilities.BackFlip();
+            backFlipDuration = newTime;
             isBackFlipping = true;
             _input.backFlip = false;
             startBackFlip = Time.time;

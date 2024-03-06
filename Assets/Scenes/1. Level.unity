@@ -5503,7 +5503,22 @@ PrefabInstance:
     - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: isCorrupted.Array.size
-      value: 6
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[0]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[2]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[3]
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -5513,7 +5528,12 @@ PrefabInstance:
     - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: isCorrupted.Array.data[5]
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6386906054898656774, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[6]
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6662152922277665246, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}

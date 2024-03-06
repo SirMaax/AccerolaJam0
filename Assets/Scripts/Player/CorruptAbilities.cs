@@ -48,6 +48,7 @@ public class CorruptAbilities : MonoBehaviour
         wallJump,
         movement,
         jumpCombo,
+        backFlip,
     }
     
     
@@ -154,5 +155,15 @@ public class CorruptAbilities : MonoBehaviour
         if (!isCorrupted[(int)ECorruptedAbilities.jumpCombo]) return 1;
         if(currentJumpIndex == 2) timesUsed += 1;
         return (float) Math.Pow(decayFactor,timesUsed);
+    }
+    /// <summary>
+    /// When the backflip is corrupt it can't be controlled for longer.
+    /// In addition this looks the user out of using the dive to cancel it.
+    /// </summary>
+    /// <returns>a time of 1 for no corruption. A time of 2 seconds for corruption</returns>
+    public float BackFlip()
+    {
+        if (!isCorrupted[(int)ECorruptedAbilities.backFlip]) return 1;
+        return 2;
     }
 }
