@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Move : MonoBehaviour
+public class Move : Obstacle
 {
     [Header("Settings")] 
     [SerializeField] private float speed;
@@ -58,17 +58,15 @@ public class Move : MonoBehaviour
         if (stopCycleAtLastPosition&& startCycleWithPlayerTouching && currentIndex == 0) stopped = true;
         else if (startCycleWithPlayerTouching && !playerTouching && currentIndex == 1) stopped = true;
     }
-
-    private void OnCollisionEnter(Collision collision)
+    
+    protected override void ExecuteOnTriggEnter()
     {
-        if (!collision.gameObject.tag.Equals("Player")) return;
         playerTouching = true;
         stopped = false;
     }
-    
-    private void OnCollisionExit(Collision collision)
+
+    protected override void ExecuteOnTriggLeave()
     {
-        if (!collision.gameObject.tag.Equals("Player")) return;
         playerTouching = false;
         if (stopCycleAtLastPosition) stopped = false;
     }

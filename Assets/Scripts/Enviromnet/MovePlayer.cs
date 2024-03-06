@@ -4,19 +4,17 @@ using System.Collections.Generic;
 using StarterAssets;
 using UnityEngine;
 
-public class MovePlayer : MonoBehaviour
+public class MovePlayer : Obstacle
 {
-    private void OnCollisionEnter(Collision collision)
+    
+    protected override void ExecuteOnTriggEnter(GameObject collision)
     {
-        if (!collision.gameObject.tag.Equals("Player")) return;
         collision.transform.parent.parent.SetParent(gameObject.transform);
     }
 
-    private void OnCollisionExit(Collision collision)
+    protected override void ExecuteOnTriggLeave(GameObject collision)
     {
-        if (!collision.gameObject.tag.Equals("Player")) return;
         collision.transform.parent.parent.SetParent(null);
     }
-    
     
 }

@@ -31,8 +31,8 @@ namespace StarterAssets
         [SerializeField] private bool canJumpHigherByHolding;
         [SerializeField] private bool canHoldDownSpaceForJumping;
         [SerializeField] bool printOutJumpCombo;
-        
-        
+
+
         [Header("Player")] 
         public float velocity;
         [Tooltip("Move speed of the character in m/s")]
@@ -123,6 +123,9 @@ namespace StarterAssets
         //If the player left the ground by jumping or falling.
         private bool leftGroundByJumping;
         
+        [Header("CorruptSettings")] 
+        private CorruptAbilities _corruptAbilities;
+        
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
@@ -170,7 +173,7 @@ namespace StarterAssets
 #endif
         private Animator _animator;
         [HideInInspector]public CharacterController _controller;
-        private StarterAssetsInputs _input;
+        protected StarterAssetsInputs _input;
         private GameObject _mainCamera;
 
         private const float _threshold = 0.01f;
@@ -213,7 +216,7 @@ namespace StarterAssets
 #endif
             gxStartRotation = gx.transform.rotation;
             AssignAnimationIDs();
-
+            _corruptAbilities = GetComponent<CorruptAbilities>();
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
@@ -511,6 +514,7 @@ namespace StarterAssets
         private void Jump(bool wallJump = false, int jumpType = 0, float overwriteJumpCurve = 0, 
             bool initialJump = false, bool jumpBufferWasUsed = false)
         {
+            if (_corruptAbilities.CorruptJump()) return;
             if (!canHoldDownSpaceForJumping 
                 && (!_input.HasPlayerReleasedJumpButtonSinceLastPress(lastTimeGrounded) && !jumpBufferWasUsed)
                 && initialJump) return;
