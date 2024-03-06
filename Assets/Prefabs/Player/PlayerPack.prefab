@@ -438,6 +438,11 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 112
       objectReference: {fileID: 0}
+    - target: {fileID: 7093030807203498024, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: _soundManager
@@ -445,8 +450,69 @@ PrefabInstance:
       objectReference: {fileID: 9108375221450597009}
     - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: spawnInterval
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: spawnPosition
+      value: 
+      objectReference: {fileID: 6896048607437698354}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: maxTimeUseable
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: toxicTrailPrefab
+      value: 
+      objectReference: {fileID: 5234224957301170606, guid: 3675daccaead2b849bfa84ce0df58167,
+        type: 3}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: minCorruptDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: folderForToxicTrails
+      value: 
+      objectReference: {fileID: 713525062512481781}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: isCorrupted.Array.size
-      value: 4
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[3]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: isCorrupted.Array.data[4]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7313554888198478620, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: speedAtWhichCorruptIsTriggered
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8955707839438475974, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 9013375371297391627, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -460,9 +526,21 @@ PrefabInstance:
       objectReference: {fileID: 6662152922277665246}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+--- !u!1 &713525062512481781 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3763563534525917423, guid: 64dce48905ffd9b4293e595fa6941544,
+    type: 3}
+  m_PrefabInstance: {fileID: 4457488702727453978}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3707542856953023122 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1058338003222149000, guid: 64dce48905ffd9b4293e595fa6941544,
+    type: 3}
+  m_PrefabInstance: {fileID: 4457488702727453978}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6896048607437698354 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7093030807203498024, guid: 64dce48905ffd9b4293e595fa6941544,
     type: 3}
   m_PrefabInstance: {fileID: 4457488702727453978}
   m_PrefabAsset: {fileID: 0}

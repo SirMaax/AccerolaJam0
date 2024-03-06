@@ -10,6 +10,25 @@ public class CorruptAbilities : MonoBehaviour
     [SerializeField] private ECorruptedAbilities list;
     public List<bool> isCorrupted;
 
+    [Header("Dive")] 
+    [SerializeField] private int maxTimeUseable;
+    private int timesUsed;
+
+    [Header("Wall Jump")] 
+    private List<GameObject> usedWalls;
+
+    [Header("Movement")] 
+    [SerializeField] private float speedAtWhichCorruptIsTriggered;
+    [SerializeField] private float spawnInterval;
+    [SerializeField] private float minCorruptDuration;
+    [SerializeField] private GameObject toxicTrailPrefab;
+    [SerializeField] private GameObject folderForToxicTrails;
+    [SerializeField] private Transform spawnPosition;
+    private float lastSpawnTime;
+    
+    private bool speedCorruptActive;
+    private float timeSpeedCorruptWasActivated;
+    
     [Header("References")]
     //Hierarchy needs to stay the same
     private LocalSoundManager _soundManager; 
@@ -20,8 +39,9 @@ public class CorruptAbilities : MonoBehaviour
     {
         baseJump,
         doubleJump,
-        dive,
+        diveLimitUse,
         wallJump,
+        movement,
     }
     
     
@@ -29,6 +49,7 @@ public class CorruptAbilities : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        usedWalls = new List<GameObject>();
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<StarterAssetsInputs>();
         _soundManager = transform.parent.GetComponentInChildren<LocalSoundManager>();
@@ -59,4 +80,63 @@ public class CorruptAbilities : MonoBehaviour
 
         return result;
     }
+    /// <summary>
+    /// Limits the number of times the dive can be used
+    /// </summary>
+    /// <returns>Yes if was used to often and cant be used further</returns>
+    public bool CorruptDive()
+    {
+        if (!isCorrupted[(int)ECorruptedAbilities.diveLimitUse]) return false;
+        if (timesUsed >= maxTimeUseable)
+        {
+            _soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
+            return true;
+        }
+        timesUsed += 1;
+
+        return false;
+    }
+    /// <summary>
+    /// Each wall can only be used once for the wall jump
+    /// </summary>
+    /// <param name="wall"></param>
+    /// <returns></returns>
+    public bool WallJump(GameObject wall)
+    {
+        if (!isCorrupted[(int)ECorruptedAbilities.wallJump]) return false;
+        if (usedWalls.Contains(wall))
+        {
+            _soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
+            return true;
+        }
+        usedWalls.Add(wall);
+        //Apply Effect to wall
+        return false;
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="speed"></param>
+    public void CorruptedMovement(float speed, bool grounded)
+    {
+        if (!isCorrupted[(int)ECorruptedAbilities.movement]) return;
+        if (speed >= speedAtWhichCorruptIsTriggered && grounded)
+        {
+            speedCorruptActive = true;
+            timeSpeedCorruptWasActivated= Time.time;
+        }
+        else if (speedCorruptActive)
+        {
+            if (Time.time - timeSpeedCorruptWasActivated > minCorruptDuration) speedCorruptActive = false;
+        }
+
+        if (speedCorruptActive && grounded && (Time.time - lastSpawnTime > spawnInterval || lastSpawnTime == 0))
+        {
+            lastSpawnTime = Time.time; 
+            Instantiate(toxicTrailPrefab, spawnPosition.position, 
+                Quaternion.identity, folderForToxicTrails.transform);
+        }
+    }
+    
 }

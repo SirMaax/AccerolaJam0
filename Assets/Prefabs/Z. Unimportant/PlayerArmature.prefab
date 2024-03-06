@@ -1209,6 +1209,37 @@ Transform:
   m_Father: {fileID: 6388403371541750797}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3763563534525917423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7093030807203498024}
+  m_Layer: 8
+  m_Name: GroundPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7093030807203498024
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3763563534525917423}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5409442552117957742}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4030330759403009903
 GameObject:
   m_ObjectHideFlags: 0
@@ -1412,6 +1443,8 @@ Transform:
   - {fileID: 1303845354187460796}
   - {fileID: 9141230817074391799}
   - {fileID: 9013375372187657930}
+  - {fileID: 7093030807203498024}
+  - {fileID: 8955707839438475974}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1577,6 +1610,7 @@ MonoBehaviour:
   wallJumpAngle: 0
   overwriteOfNormalMovementPeriod: 1
   wallJumpMultiplier: 2
+  touchedWall: {fileID: 0}
   onWall: 0
   entryVector: {x: 0, y: 0, z: 0}
   divingSpeed: 15
@@ -1607,6 +1641,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   list: 0
   isCorrupted: 
+  maxTimeUseable: 0
+  speedAtWhichCorruptIsTriggered: 0
+  minCorruptDuration: 0
+  toxicTrailPrefab: {fileID: 0}
+  folderForToxicTrails: {fileID: 0}
+  spawnPosition: {fileID: 0}
   _controller: {fileID: 0}
 --- !u!114 &9004873613286380200
 MonoBehaviour:
@@ -2594,6 +2634,52 @@ Transform:
   m_Father: {fileID: 7840915126183052085}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8382163135714671346
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8955707839438475974}
+  - component: {fileID: 5670787097694629855}
+  m_Layer: 8
+  m_Name: GroundTriggerForMovingWithObject
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8955707839438475974
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8382163135714671346}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.14, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5409442552117957742}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &5670787097694629855
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8382163135714671346}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.45, z: 0}
 --- !u!1 &8447990097338931145
 GameObject:
   m_ObjectHideFlags: 0

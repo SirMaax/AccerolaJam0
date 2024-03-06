@@ -1,21 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    //Initial value is zero
+    [SerializeField] private ETag tag;
 
-    // Update is called once per frame
-    void Update()
+    public enum ETag
     {
-        
+        Player,
+        PlayerTrigger,
     }
-
+    
     protected virtual void ExecuteOnTriggEnter(GameObject collision) { }
     
     protected virtual void ExecuteOnTriggLeave(GameObject collision) { }
@@ -24,14 +23,14 @@ public class Obstacle : MonoBehaviour
     
     protected void OnTriggerEnter(Collider collision)
     {
-        if (!collision.gameObject.tag.Equals("Player")) return;
+        if (!collision.gameObject.tag.Equals(tag.ToString())) return;
         ExecuteOnTriggEnter(collision.gameObject);
         ExecuteOnTriggEnter();
     }
     
     protected void OnTriggerExit(Collider collision)
     {
-        if (!collision.gameObject.tag.Equals("Player")) return;
+        if (!collision.gameObject.tag.Equals(tag.ToString())) return;
         ExecuteOnTriggLeave(collision.gameObject);
         ExecuteOnTriggLeave();
     }

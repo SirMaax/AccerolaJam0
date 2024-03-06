@@ -55,7 +55,7 @@ public class Move : Obstacle
         transform.position = locations[currentIndex];
         if (currentIndex + 1 == locations.Count)currentIndex = 0;
         else currentIndex += 1;
-        if (stopCycleAtLastPosition&& startCycleWithPlayerTouching && currentIndex == 0) stopped = true;
+        if (stopCycleAtLastPosition&& playerTouching && startCycleWithPlayerTouching && currentIndex == 0) stopped = true;
         else if (startCycleWithPlayerTouching && !playerTouching && currentIndex == 1) stopped = true;
     }
     

@@ -7,6 +7,7 @@ public class WallCheck : MonoBehaviour
 {
     [SerializeField] private ThirdPersonController _controller;
     [SerializeField] private LayerMask _layerMask;
+    
     private void OnCollisionEnter(Collision collision)
     {
         int thisLayerMask = 1 << collision.gameObject.layer;
@@ -22,5 +23,7 @@ public class WallCheck : MonoBehaviour
         Debug.DrawRay(transform.position,  _controller.entryVector,Color.red);
         Debug.LogError("Drawing Stuff");
         Debug.Log(_controller.entryVector);
+        _controller.touchedWall = collision.gameObject;
+        Debug.Log(_controller.touchedWall);
     }
 }

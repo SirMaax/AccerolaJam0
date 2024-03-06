@@ -98,6 +98,7 @@ namespace StarterAssets
         [SerializeField] public float wallJumpAngle;
         [SerializeField] private float overwriteOfNormalMovementPeriod;
         [SerializeField] private float wallJumpMultiplier;
+        [HideInInspector] public GameObject touchedWall;
         public bool onWall = false;
         public Vector3 entryVector;
         private float timeLeftWall;
@@ -384,7 +385,7 @@ namespace StarterAssets
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
                 // transform.Translate(outsideMovement);
             }
-
+            _corruptAbilities.CorruptedMovement(currentHorizontalSpeed,Grounded);
             // update animator if using character
             if (_hasAnimator)
             {
@@ -439,9 +440,11 @@ namespace StarterAssets
                 && _input.HasReleasedJumpButtonSinceLastJump(lastTimeGrounded) && _input.timeHeldJumpButton < jumpBuffer)
             {
             //Walljump
+                onWall = false;
+                Debug.Log("wall" + touchedWall);
+                if (_corruptAbilities.WallJump(touchedWall)) return;
                 timeLeftWall = Time.time;
                 wallJump = true;
-                onWall = false;
                 Jump(true, jumpType: 1);
             }
             else if (Grounded)
@@ -659,6 +662,7 @@ namespace StarterAssets
         {
             if (_input.diving && CanDive())
             {
+                if (_corruptAbilities.CorruptDive()) return;
                 _input.diving = false;
                 isDiving = true;
                 divingDirection = _input.move;
