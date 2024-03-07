@@ -68,7 +68,7 @@ namespace StarterAssets
         public float JumpTimeout = 0.0f;
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
-        [Tooltip("The additional multiplier speed the player has during the jump")]
+        [Tooltip("The additional multiplier speed the player has during the jump is only applied when under a certain speed")]
         [SerializeField] private float[] jumpSpeedMultiplier;
         private Vector3 jumpDirection;
         [SerializeField] private AnimationCurve jumpCurveOverTime;
@@ -87,7 +87,9 @@ namespace StarterAssets
         private bool startedJump = false;
 
         [Header("Double Jump")] 
+        [SerializeField] private float forceDoubleJump;
         private bool usedDoubleJump = false;
+        
 
         [Header("Jump combo")]
         [SerializeField] private float timingForJumpCombo;
@@ -407,14 +409,16 @@ namespace StarterAssets
                 _controller.Move(backFlipDirection * backFlipBackwardsMovement * Time.deltaTime +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
-            else if (!Grounded && lastJumpType == 0)
+            else if (!Grounded && lastJumpType != -1)
             {
                 if (_input.move != Vector2.zero)
                 {
                     jumpDirection.x  = Mathf.Lerp(jumpDirection.x, targetDirection.x, lerpValueForAirControl);
                     jumpDirection.z  = Mathf.Lerp(jumpDirection.z, targetDirection.z, lerpValueForAirControl);
                 }
-                _controller.Move(jumpDirection * (_speed * Time.deltaTime) +
+                Debug.Log(velocity);
+                float jumpSpeedMulti = velocity < 6 ? jumpSpeedMultiplier[currentJumpIndex] : 1;
+                _controller.Move(jumpDirection * (_speed * Time.deltaTime * jumpSpeedMulti) +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
             else
@@ -461,8 +465,8 @@ namespace StarterAssets
         private void ContinueJump()
         {
             if(CanPlayerJump())
-            if(!canJumpHigherByHolding || currentJumpIndex >= 1 ) return;
-            if (startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
+            if(currentJumpIndex >= 1 ) return;
+            if (canJumpHigherByHolding && startedJump && _input.jump && Time.time - _input.timeOfLastJump < maxJumpButtonHolding && canJump)
             {
                 Jump(jumpType: 2);
             }
@@ -470,7 +474,7 @@ namespace StarterAssets
              else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump)
             {
                 usedDoubleJump = true;
-                Jump(jumpType:2,overwriteJumpCurve:2);
+                Jump(jumpType:2,overwriteJumpCurve:forceDoubleJump);
             }
         }
 
@@ -598,7 +602,6 @@ namespace StarterAssets
         {
             jumpDirection.y = 0;
             jumpDirection = velocityVector.normalized;
-            Debug.Log(jumpDirection);
             timeOffInitialJump = Time.time;
             Grounded = false;
             leftGroundByJumping = true;
@@ -716,14 +719,15 @@ namespace StarterAssets
                 Vector3 rot = _mainCamera.transform.rotation.eulerAngles;
                 rot.x = 0;
                 Quaternion editedRot = Quaternion.Euler(rot);
-                if (_input.move == Vector2.zero)divingDirection = transform.forward;
-                else divingDirection =  editedRot * new Vector3(_input.move.x, 0, _input.move.y);
-                
+                if (_input.move == Vector2.zero) divingDirection = transform.forward;
+                else divingDirection = editedRot * new Vector3(_input.move.x, 0, _input.move.y);
+
                 wallJump = false;
 
                 //turn in that diretion
                 LookInDiretion(divingDirection);
             }
+            else _input.diving = false;
 
             if (!isDiving) return;
             _controller.Move(divingSpeed * Time.deltaTime * divingDirection
@@ -793,6 +797,14 @@ namespace StarterAssets
         private void ResetGxRotation()
         {
             gx.transform.rotation = gxStartRotation;
+        }
+
+        public void Teleport(Vector3 position)
+        {
+            _controller.enabled = false;
+            transform.position = position;
+            Debug.Log(position);
+            _controller.enabled = true;
         }
     }
     

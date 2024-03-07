@@ -6,7 +6,10 @@ public class GameManager : MonoBehaviour
 {
     [Header("State of the game")] 
     public int currentStage;
-    
+
+
+    [Header("References")] 
+    private CheckPointManager _checkPointManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +25,7 @@ public class GameManager : MonoBehaviour
     public static void CrossedFinishLine(int goalID)
     {
         float time = Time.time;
-        Debug.Log("did it");
         //Or stop timer etc.
     }
+    
 }

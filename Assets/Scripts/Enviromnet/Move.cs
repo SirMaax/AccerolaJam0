@@ -9,6 +9,7 @@ public class Move : Obstacle
     [SerializeField] private float speed;
     [SerializeField] private List<Transform> _transforms;
     private List<Vector3> locations;
+    [SerializeField] Transform overrideTransform;
     
     [Header("Player Touching")]
     [Tooltip("Starts at first cycle when player is touching and when player leaves will stop again at 0 cycle")]
@@ -36,13 +37,29 @@ public class Move : Obstacle
     // Update is called once per frame
     void Update()
     {
+        Vector3 pos = overrideTransform!=null ? overrideTransform.position : transform.position;
+        
         if (stopped) return;
         Vector3 targetPos = locations[currentIndex];
         
-        Vector3 direction = targetPos - transform.position;
-        Vector3 posBefore= transform.position;
-        transform.Translate(speed * Time.deltaTime * direction.normalized);
-        Vector3 posAfter = transform.position;
+        Vector3 direction = targetPos - pos;
+        Vector3 posBefore= pos;
+        // if(overrideTransform!=null)overrideTransform.Translate(speed * Time.deltaTime * direction.normalized);
+        // else transform.Translate(speed * Time.deltaTime * direction.normalized);
+
+        if (overrideTransform != null)
+        {
+            Vector3 currentPos = overrideTransform.position;
+            currentPos += speed * Time.deltaTime * direction.normalized;
+            overrideTransform.position = currentPos;
+        }
+        else
+        {
+            Vector3 currentPos = transform.position;
+            currentPos += speed * Time.deltaTime * direction.normalized;
+            transform.position = currentPos;
+        }
+        Vector3 posAfter = overrideTransform!=null? overrideTransform.position : transform.position;
         if((posBefore - targetPos).magnitude + (posAfter - targetPos).magnitude 
            == (posBefore - posAfter).magnitude)
         {
@@ -52,7 +69,8 @@ public class Move : Obstacle
 
     private void NextInCycle()
     {
-        transform.position = locations[currentIndex];
+        if(overrideTransform!=null) overrideTransform.position = locations[currentIndex];
+        else transform.position = locations[currentIndex];
         if (currentIndex + 1 == locations.Count)currentIndex = 0;
         else currentIndex += 1;
         if (stopCycleAtLastPosition&& playerTouching && startCycleWithPlayerTouching && currentIndex == 0) stopped = true;

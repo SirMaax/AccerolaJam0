@@ -9,7 +9,10 @@ public class GoalTrigger : MonoBehaviour
     [SerializeField] private TypeGoals _typeGoal;
     [SerializeField] private float timeSave;
     [SerializeField] private int goalID;
+    private Transform respawnPoint;
+    private bool wasTriggered = false;
     
+    private CheckPointManager _checkPointManager;
     private enum TypeGoals
     {
         normal,
@@ -20,12 +23,14 @@ public class GoalTrigger : MonoBehaviour
     void Start()
     {
         if (_typeGoal == TypeGoals.normal) timeSave = 0;
+        _checkPointManager = GameObject.FindWithTag("CheckPointManager").GetComponent<CheckPointManager>();
     }
-
-
+    
     private void OnTriggerExit(Collider other)
     {
-        if (!other.gameObject.tag.Equals("PlayerTrigger")) return;
-        GameManager.CrossedFinishLine(goalID);
+        if (!other.gameObject.tag.Equals("PlayerTrigger")|| wasTriggered) return;
+        wasTriggered = true;
+        respawnPoint = other.transform;
+        _checkPointManager.CrossedFinishLine(goalID,respawnPoint,timeSave);
     }
 }
