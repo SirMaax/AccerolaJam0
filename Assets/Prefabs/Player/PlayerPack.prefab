@@ -285,6 +285,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: lerpValueForAirControl
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: jumpMultiplier.Array.data[0]
       value: 1.7
       objectReference: {fileID: 0}
@@ -326,7 +331,7 @@ PrefabInstance:
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[2].time
-      value: 1.9923463
+      value: 2.000371
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -336,7 +341,7 @@ PrefabInstance:
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[2].value
-      value: 7.62866
+      value: 9.337893
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}

@@ -11,6 +11,7 @@ namespace StarterAssets
 	{
 		[Header("Character Input Values")]
 		public Vector2 move;
+		private Vector2 oldMoveDirection;
 		public Vector2 look;
 		public bool sprint;
 		[Tooltip("If the input direction was changed in the opposite direction instantly")]
@@ -83,9 +84,9 @@ namespace StarterAssets
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{
-			if (Vector2.Dot(newMoveDirection, move) < -0.8) movedOppositeDirection = true;
+			if (newMoveDirection * -1 == oldMoveDirection) movedOppositeDirection = true;
+			if(newMoveDirection!=Vector2.zero)oldMoveDirection = newMoveDirection;
 			move = newMoveDirection;
-			
 		} 
 
 		public void LookInput(Vector2 newLookDirection)

@@ -23,7 +23,7 @@ namespace StarterAssets
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
-        [Header("Test")] [SerializeField] private float test;
+        [Header("Test")] 
         
         [Header("Settings")] 
         [SerializeField] private bool playerIsAlwaysSprinting;
@@ -69,8 +69,11 @@ namespace StarterAssets
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
         [Tooltip("The additional multiplier speed the player has during the jump")]
-        [SerializeField] private float[] jumpSpeedMultiplier; 
+        [SerializeField] private float[] jumpSpeedMultiplier;
+        private Vector3 jumpDirection;
         [SerializeField] private AnimationCurve jumpCurveOverTime;
+        [Tooltip("The lerp value that changes the jump direction over time")]
+        [SerializeField] private float lerpValueForAirControl;
         [SerializeField] private float jumpBuffer;
         [SerializeField] private float coyoteTime;
         [SerializeField] private float maxJumpButtonHolding;
@@ -324,6 +327,11 @@ namespace StarterAssets
             if (isDiving) return;
             if (Grounded) _verticalVelocity = -2f;
             // set target speed based on move speed, sprint speed and if sprint is pressed
+            if (_input.movedOppositeDirection)
+            {
+                _input.movedOppositeDirection = false;
+                if(Grounded) currentAccelerationTime = -0.25f;
+            }
             // float targetSpeed = _input.sprint || playerIsAlwaysSprinting ? SprintSpeed : MoveSpeed;
             float targetSpeed = MovementSpeed.Evaluate(currentAccelerationTime);
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
@@ -341,30 +349,33 @@ namespace StarterAssets
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
+            if (Grounded || lastJumpType == -1)
+            {
+                  if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+                      currentHorizontalSpeed > targetSpeed + speedOffset)
+                  {
+                      float newspeedChangeRate = currentHorizontalSpeed > targetSpeed ? 6 : SpeedChangeRate;
+                      // creates curved result rather than a linear one giving a more organic speed change
+                      // note T in Lerp is clamped, so we don't need to clamp our speed
+                      _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+                          Time.deltaTime * newspeedChangeRate);
+        
+                      // round speed to 3 decimal places
+                      _speed = Mathf.Round(_speed * 1000f) / 1000f;
+                  }
+                  else
+                  {
+                      _speed = targetSpeed;
+                  }
+                
+            }
             // accelerate or decelerate to target speed
-            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-                currentHorizontalSpeed > targetSpeed + speedOffset)
-            {
-                float newspeedChangeRate = currentHorizontalSpeed > targetSpeed ? 6 : SpeedChangeRate;
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
-                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                    Time.deltaTime * newspeedChangeRate);
-
-                // round speed to 3 decimal places
-                _speed = Mathf.Round(_speed * 1000f) / 1000f;
-            }
-            else
-            {
-                _speed = targetSpeed;
-            }
 
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
             // Reduce control in air
             Vector3 inputDirection= new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-            
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
@@ -394,6 +405,16 @@ namespace StarterAssets
                 Vector3 backFlipDirection = new Vector3(0, 0, -1);
                 backFlipDirection = transform.rotation * backFlipDirection;
                 _controller.Move(backFlipDirection * backFlipBackwardsMovement * Time.deltaTime +
+                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            }
+            else if (!Grounded && lastJumpType == 0)
+            {
+                if (_input.move != Vector2.zero)
+                {
+                    jumpDirection.x  = Mathf.Lerp(jumpDirection.x, targetDirection.x, lerpValueForAirControl);
+                    jumpDirection.z  = Mathf.Lerp(jumpDirection.z, targetDirection.z, lerpValueForAirControl);
+                }
+                _controller.Move(jumpDirection * (_speed * Time.deltaTime) +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
             else
@@ -575,6 +596,9 @@ namespace StarterAssets
         /// </summary>
         private void HandleJumpCombo()
         {
+            jumpDirection.y = 0;
+            jumpDirection = velocityVector.normalized;
+            Debug.Log(jumpDirection);
             timeOffInitialJump = Time.time;
             Grounded = false;
             leftGroundByJumping = true;
