@@ -23,7 +23,7 @@ namespace StarterAssets
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
-        [Header("Test")] 
+        [Header("Test")] [SerializeField] private float test;
         
         [Header("Settings")] 
         [SerializeField] private bool playerIsAlwaysSprinting;
@@ -104,10 +104,12 @@ namespace StarterAssets
         [SerializeField] private float overwriteOfNormalMovementPeriod;
         [SerializeField] private float wallJumpMultiplier;
         [HideInInspector] public GameObject touchedWall;
+        [Tooltip("Lerp value used for making the walljump direction more like the user input direction")]
+        [SerializeField] private float lerpValueWallJump;
         public bool onWall = false;
-        public Vector3 entryVector;
+        [HideInInspector] public bool wallJump;
+        [HideInInspector] public Vector3 entryVector;
         private float timeLeftWall;
-        private bool wallJump;
 
         [Header("Diving")] 
         [SerializeField] private float divingSpeed;
@@ -396,11 +398,15 @@ namespace StarterAssets
             if(wallJump)
             {
                 //Walljump
+                if (_input.move != Vector2.zero)
+                {
+                    //If jumpDirection = Vector3.zero mehr lerpValue
+                    entryVector.x  = Mathf.Lerp(entryVector.x, targetDirection.x, lerpValueWallJump);
+                    entryVector.z  = Mathf.Lerp(entryVector.z, targetDirection.z, lerpValueWallJump);
+                }
                 entryVector.y = 0;
-                Debug.DrawRay(transform.position,entryVector * (SprintSpeed * wallJumpMultiplier * Time.deltaTime) +
-                                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime,Color.red);
                 _controller.Move(entryVector * (SprintSpeed * wallJumpMultiplier * Time.deltaTime) +
-                                         new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+                                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
             else if (isBackFlipping)
             {
@@ -409,15 +415,17 @@ namespace StarterAssets
                 _controller.Move(backFlipDirection * backFlipBackwardsMovement * Time.deltaTime +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
-            else if (!Grounded && lastJumpType != -1)
+            else if (!Grounded && (lastJumpType == 0 || lastJumpType == 2 ))
             {
                 if (_input.move != Vector2.zero)
                 {
+                    //If jumpDirection = Vector3.zero mehr lerpValue
                     jumpDirection.x  = Mathf.Lerp(jumpDirection.x, targetDirection.x, lerpValueForAirControl);
                     jumpDirection.z  = Mathf.Lerp(jumpDirection.z, targetDirection.z, lerpValueForAirControl);
                 }
-                Debug.Log(velocity);
                 float jumpSpeedMulti = velocity < 6 ? jumpSpeedMultiplier[currentJumpIndex] : 1;
+                //For slow jumps 
+                if (_speed <= 2 && _input.move != Vector2.zero) _speed = 2;
                 _controller.Move(jumpDirection * (_speed * Time.deltaTime * jumpSpeedMulti) +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
@@ -471,8 +479,9 @@ namespace StarterAssets
                 Jump(jumpType: 2);
             }
             //Double Jump canJump is false after first jump button is released
-             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump)
+             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump && !onWall && !wallJump)
             {
+                Debug.Log("used double jump");
                 usedDoubleJump = true;
                 Jump(jumpType:2,overwriteJumpCurve:forceDoubleJump);
             }
@@ -704,6 +713,7 @@ namespace StarterAssets
             if (Time.time - timeLeftWall > overwriteOfNormalMovementPeriod)
             {
                 wallJump = false;
+                Debug.LogError("wall jump over");
             }
         }
 

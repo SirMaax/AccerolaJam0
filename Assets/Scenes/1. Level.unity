@@ -641,6 +641,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -1465,6 +1466,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 0
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 0}
   flipSpeed: 0
   timeBetweenSmallFlip: 0
@@ -2057,6 +2059,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -2411,6 +2414,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -3379,6 +3383,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -3734,6 +3739,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -3786,6 +3792,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 90
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: -1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.02
@@ -4424,6 +4431,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -7843,7 +7851,7 @@ PrefabInstance:
     - target: {fileID: 6662152922277665246, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: m_Lens.m_SensorSize.x
-      value: 1.7776657
+      value: 1.7773151
       objectReference: {fileID: 0}
     - target: {fileID: 6662152922277665247, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -7878,7 +7886,7 @@ PrefabInstance:
     - target: {fileID: 6662152923156963815, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: m_Lens.m_SensorSize.x
-      value: 1.7783247
+      value: 1.7773151
       objectReference: {fileID: 0}
     - target: {fileID: 6896048607437698354, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -8007,28 +8015,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
-      propertyPath: JumpHeight
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
       propertyPath: weakFactor
       value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
       propertyPath: backFlipHeight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: forceDoubleJump
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: backFlipDuration
-      value: 1
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -8037,18 +8030,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
-      propertyPath: backFlipRotateSpeed
-      value: 360
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
       propertyPath: canJumpHigherByHolding
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: backFlipBackwardsMovement
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -8082,11 +8065,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
       propertyPath: jumpSpeedMultiplier.Array.data[0]
       value: 1.5
       objectReference: {fileID: 0}
@@ -8102,76 +8080,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[0].time
-      value: 0.003231421
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].time
-      value: 0.22368297
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[2].time
-      value: 0.6504667
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].time
-      value: 2.000371
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[0].value
-      value: 1.7901657
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].value
-      value: 3.812535
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[2].value
-      value: 5.973309
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].value
-      value: 9.337893
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].inSlope
-      value: 9.173759
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].inSlope
-      value: Infinity
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].inWeight
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[2].inWeight
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].inWeight
-      value: 0.33333334
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].outSlope
-      value: Infinity
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
       propertyPath: jumpCurveOverTime.m_Curve.Array.data[0].time
       value: 0
       objectReference: {fileID: 0}
@@ -8179,21 +8087,6 @@ PrefabInstance:
         type: 3}
       propertyPath: jumpCurveOverTime.m_Curve.Array.data[1].time
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[0].outWeight
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].outWeight
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].outWeight
-      value: 0.33333334
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -8207,33 +8100,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].tangentMode
-      value: 101
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[3].tangentMode
-      value: 103
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
       propertyPath: jumpCurveOverTime.m_Curve.Array.data[1].inSlope
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[0].weightedMode
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[1].weightedMode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
-        type: 3}
-      propertyPath: MovementSpeed.m_Curve.Array.data[2].weightedMode
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9044861514008048581, guid: 6b99e6fa48d29e54bb77458d1d1abb6b,
         type: 3}
@@ -9703,6 +9571,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -10144,6 +10013,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -10392,6 +10262,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -10997,6 +10868,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01
@@ -12603,6 +12475,7 @@ MonoBehaviour:
   tag: 0
   rotationDegree: 180
   flipTime: 5
+  timeSoundPlays: 0
   flipRotation: {x: 0, y: 0, z: 1}
   flipSpeed: 5
   timeBetweenSmallFlip: 0.01

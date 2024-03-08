@@ -15,6 +15,7 @@ public class SoundManager : MonoBehaviour
     public enum EAudioClips
     {
         abilityWasBlockedDueToCorrupt,
+        flipPanelClockSound,
     }
     
     private void Start()

@@ -1596,9 +1596,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  lerpValueForAirControl: 0
   jumpBuffer: 0.1
   coyoteTime: 0.1
   maxJumpButtonHolding: 0.3
+  forceDoubleJump: 0
   timingForJumpCombo: 0.1
   jumpMultiplier:
   - 1
@@ -1614,6 +1616,10 @@ MonoBehaviour:
   onWall: 0
   entryVector: {x: 0, y: 0, z: 0}
   divingSpeed: 15
+  backFlipHeight: 0
+  backFlipDuration: 1
+  backFlipBackwardsMovement: 0
+  backFlipRotateSpeed: 0
   Grounded: 1
   GroundedOffset: -0.17
   GroundedRadius: 0.25
@@ -1643,10 +1649,12 @@ MonoBehaviour:
   isCorrupted: 
   maxTimeUseable: 0
   speedAtWhichCorruptIsTriggered: 0
+  spawnInterval: 0
   minCorruptDuration: 0
   toxicTrailPrefab: {fileID: 0}
   folderForToxicTrails: {fileID: 0}
   spawnPosition: {fileID: 0}
+  decayFactor: 0.8999999761581421
   _controller: {fileID: 0}
 --- !u!114 &9004873613286380200
 MonoBehaviour:
@@ -1668,6 +1676,7 @@ MonoBehaviour:
   timeOfLastJump: 0
   timeHeldJumpButton: 0
   diving: 0
+  backFlip: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1

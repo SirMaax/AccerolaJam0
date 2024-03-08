@@ -280,13 +280,48 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: JumpHeight
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: GroundedRadius
       value: 0.24
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: backFlipHeight
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: forceDoubleJump
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: lerpValueWallJump
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: wallJumpMultiplier
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: backFlipRotateSpeed
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: lerpValueForAirControl
       value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: backFlipBackwardsMovement
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -301,7 +336,7 @@ PrefabInstance:
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -325,43 +360,73 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[0].time
+      value: 0.003231421
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].time
-      value: 0.10233283
+      value: 0.22368297
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[2].time
+      value: 0.6504667
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[3].time
       value: 2.000371
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[0].value
+      value: 1.7901657
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].value
-      value: 5.973309
+      value: 3.812535
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[2].value
+      value: 5.973309
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[3].value
       value: 9.337893
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].inSlope
-      value: 20.622036
+      value: 9.173759
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].inWeight
-      value: 0.50953746
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[2].inWeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[0].outWeight
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].outWeight
-      value: 0.33333334
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].tangentMode
-      value: 97
+      value: 101
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -370,7 +435,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[0].weightedMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: MovementSpeed.m_Curve.Array.data[1].weightedMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4636987961440718559, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: MovementSpeed.m_Curve.Array.data[2].weightedMode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5409442552117957742, guid: 64dce48905ffd9b4293e595fa6941544,
