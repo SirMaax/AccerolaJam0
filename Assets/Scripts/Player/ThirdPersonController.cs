@@ -113,6 +113,7 @@ namespace StarterAssets
 
         [Header("Diving")] 
         [SerializeField] private float divingSpeed;
+        [SerializeField] private float diveGravity;
         private bool isDiving;
         private Vector3 divingDirection;
 
@@ -744,7 +745,7 @@ namespace StarterAssets
                              + new Vector3(0,_verticalVelocity,0) * Time.deltaTime);
             if (_verticalVelocity < _terminalVelocity)
             {
-                _verticalVelocity += Gravity * Time.deltaTime;
+                _verticalVelocity += diveGravity * Time.deltaTime;
             }
         }
 
@@ -787,6 +788,7 @@ namespace StarterAssets
             }
             if (!_input.backFlip  || !Grounded || isDiving)
             {
+                if(_input.backFlip)currentJumpIndex = 0;
                 _input.backFlip = false;
                 return;
             }

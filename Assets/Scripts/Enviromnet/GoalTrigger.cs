@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using StarterAssets;
 using UnityEngine;
 
 public class GoalTrigger : MonoBehaviour
@@ -9,6 +10,10 @@ public class GoalTrigger : MonoBehaviour
     [SerializeField] private TypeGoals _typeGoal;
     [SerializeField] private float timeSave;
     [SerializeField] private int goalID;
+    [Tooltip("When this is set upon entering through the portal will teleport the player to the position")]
+    [SerializeField] private Vector3 teleportPoint;
+    [SerializeField] private bool canBeTriggeredMoreThanOnce;
+    
     private Transform respawnPoint;
     private bool wasTriggered = false;
     
@@ -28,9 +33,10 @@ public class GoalTrigger : MonoBehaviour
     
     private void OnTriggerExit(Collider other)
     {
-        if (!other.gameObject.tag.Equals("PlayerTrigger")|| wasTriggered) return;
+        if (!other.gameObject.tag.Equals("PlayerTrigger") || (wasTriggered && !canBeTriggeredMoreThanOnce)) return;
         wasTriggered = true;
         respawnPoint = other.transform;
         _checkPointManager.CrossedFinishLine(goalID,respawnPoint,timeSave);
+        if (teleportPoint != Vector3.zero)other.transform.parent.GetComponentInChildren<ThirdPersonController>().Teleport(teleportPoint);
     }
 }
