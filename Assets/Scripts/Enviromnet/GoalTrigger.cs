@@ -33,6 +33,8 @@ public class GoalTrigger : MonoBehaviour
     
     private void OnTriggerExit(Collider other)
     {
+        //Maybe return after triggering firstcheckpoint
+        if(goalID == 0)_checkPointManager.FirstCheckPoint();
         if (!other.gameObject.tag.Equals("PlayerTrigger") || (wasTriggered && !canBeTriggeredMoreThanOnce)) return;
         wasTriggered = true;
         respawnPoint = other.transform;
