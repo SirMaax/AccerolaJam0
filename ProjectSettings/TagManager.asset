@@ -8,6 +8,8 @@ TagManager:
   - Wall
   - PlayerTrigger
   - CheckPointManager
+  - ProgressSystem
+  - Timer
   layers:
   - Default
   - TransparentFX

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ProgressSystem : MonoBehaviour
@@ -6,9 +8,10 @@ public class ProgressSystem : MonoBehaviour
     [Header("Progression")] 
     public int currentSection;
     public int currentSubSection;
+    [SerializeField] private int maxSection;
     public static int CURRENT_SECTION;
+    
     [Header("Heat")]
-    [SerializeField]private List<bool> isCorrupted;
     private int currentHeat;
     private int amountModifiers;
 
@@ -22,29 +25,33 @@ public class ProgressSystem : MonoBehaviour
     [SerializeField] private List<GameObject> additionalHeat;
     
     [Header("References")] 
+    [SerializeField]private CorruptAbilities _corruptAbilities;
+    [SerializeField] private TMP_Text heatText;
+    [SerializeField] private TMP_Text timeText;
+    [SerializeField] private TMP_Text requiredHeatText;
+    [SerializeField] private TMP_Text requiredTimeText;
     private Timer timer;
-    private CorruptAbilities _corruptAbilities;
     private DialogManager _dialog;
     
     // Start is called before the first frame update
     void Start()
     {
         timer = GameObject.FindWithTag("Timer").GetComponent<Timer>();
-        _corruptAbilities = GameObject.FindWithTag("Player").GetComponent<CorruptAbilities>();
-        _dialog = GameObject.FindWithTag("DialogManager").GetComponent<DialogManager>();
+        // _corruptAbilities = GameObject.FindWithTag("Player").GetComponent<CorruptAbilities>();
+        // _dialog = GameObject.FindWithTag("DialogManager").GetComponent<DialogManager>();
         amountModifiers = _corruptAbilities.isCorrupted.Count;
-        isCorrupted = new List<bool>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 
+    
+    
     public bool CanPlayerProgress()
     {
-        return timer.timeForCurrentSection[currentSection] <= timeRequirements[currentSection] &&
+        return timer.timeForCurrentSection[currentSection][heatRequirements[currentSection]] <= timeRequirements[currentSection] &&
                 currentHeat >= heatRequirements[currentSection];
     }
 
@@ -56,17 +63,45 @@ public class ProgressSystem : MonoBehaviour
         if(additionalHeat.Count < currentSection && additionalHeat[currentSection]!= null)additionalHeat[currentHeat].SetActive(true);
         _dialog.TriggerDialogForSection(currentSection);
     }
-
-    private void SetHeatModifiersStatus()
-    {
-        for (int i = 0; i < isCorrupted.Count; i++)
-        {
-            _corruptAbilities.isCorrupted[i] = isCorrupted[i];
-        }
-    }
-
+    
     public void SetStatusOfHeat(bool status, int id)
     {
-         isCorrupted[id] = status;
+        _corruptAbilities.isCorrupted[id] = status;
+    }
+    
+    public void EnableHeatModifieres()
+    {
+        currentHeat = 0;
+        foreach (var ability in _corruptAbilities.isCorrupted)
+        {
+            currentHeat += ability ? 1 : 0;
+        }
+        _corruptAbilities.abilitiesAreOverRidden = true;
+    }
+
+    public void SetText()
+    {
+        heatText.SetText("Heat " + currentHeat.ToString());
+
+        float time = timer.GetTimeForHeatAndSection(currentSection, currentHeat);
+        if(time == 0) timeText.SetText("No completion time");
+        else timeText.SetText(TimeSpan.FromSeconds(time).ToString());
+        requiredHeatText.SetText("Required Heat: " + heatRequirements[currentSection]);
+        requiredTimeText.SetText("Required Time: " + TimeSpan.FromSeconds(timeRequirements[currentSection]));
+    }
+
+    public int GetCurrentHeat()
+    {
+        return currentHeat;
+    }
+
+    public int GetMaxSections()
+    {
+        return maxSection;
+    }
+
+    public int GetMaxPossibleHeat()
+    {
+        return _corruptAbilities.isCorrupted.Count;
     }
 }

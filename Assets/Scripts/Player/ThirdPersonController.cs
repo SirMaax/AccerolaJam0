@@ -245,6 +245,8 @@ namespace StarterAssets
 
         private void Update()
         {
+            if (_input.isUsingUi) return;
+            
             Vector3 speed = _controller.velocity;
             speed.y = 0;
             velocity = speed.magnitude;

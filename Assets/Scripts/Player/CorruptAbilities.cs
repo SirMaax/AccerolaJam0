@@ -7,6 +7,7 @@ using UnityEngine;
 public class CorruptAbilities : MonoBehaviour
 {
     [Header("Corrupted Abilities")] 
+    public bool abilitiesAreOverRidden;
     [SerializeField] private ECorruptedAbilities list;
     public List<bool> isCorrupted;
 
@@ -78,6 +79,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>Returns true if corrupt logic is working right now </returns>
     public bool CorruptJump()
     {
+        if (!abilitiesAreOverRidden) return false;
         bool result = false;
         if (!isCorrupted[(int)ECorruptedAbilities.baseJump]) return false;
         if (_input.move.y > 0) result = true;
@@ -93,6 +95,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>Yes if was used to often and cant be used further</returns>
     public bool CorruptDive()
     {
+        if (!abilitiesAreOverRidden) return false;
         if (!isCorrupted[(int)ECorruptedAbilities.diveLimitUse]) return false;
         if (timesUsed >= maxTimeUseable)
         {
@@ -110,6 +113,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns></returns>
     public bool WallJump(GameObject wall)
     {
+        if (!abilitiesAreOverRidden) return false;
         if (!isCorrupted[(int)ECorruptedAbilities.wallJump]) return false;
         if (usedWalls.Contains(wall))
         {
@@ -128,6 +132,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <param name="speed"></param>
     public void CorruptedMovement(float speed, bool grounded)
     {
+        if (!abilitiesAreOverRidden) return;
         if (!isCorrupted[(int)ECorruptedAbilities.movement]) return;
         if (speed >= speedAtWhichCorruptIsTriggered && grounded)
         {
@@ -152,6 +157,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>1 if nothing is changed else the jumpower for the jump</returns>
     public float JumpCombo(int currentJumpIndex)
     {
+        if (!abilitiesAreOverRidden) return 1;
         if (!isCorrupted[(int)ECorruptedAbilities.jumpCombo]) return 1;
         if(currentJumpIndex == 2) timesUsed += 1;
         return (float) Math.Pow(decayFactor,timesUsed);
@@ -163,6 +169,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>a time of 1 for no corruption. A time of 2 seconds for corruption</returns>
     public float BackFlip()
     {
+        if (!abilitiesAreOverRidden) return 1;
         if (!isCorrupted[(int)ECorruptedAbilities.backFlip]) return 1;
         return 2;
     }

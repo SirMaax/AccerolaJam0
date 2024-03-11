@@ -39,5 +39,6 @@ public class CheckPointManager : MonoBehaviour
     public void FirstCheckPoint()
     {
         timer.StartTimer();
+        
     }
 }

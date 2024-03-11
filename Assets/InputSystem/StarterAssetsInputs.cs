@@ -35,6 +35,10 @@ namespace StarterAssets
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
 
+		[Header("UI Settings")]
+		public bool isInUiRange;
+		public bool isUsingUi;
+
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 
 		private void Start()
@@ -55,6 +59,12 @@ namespace StarterAssets
 
 		public void OnDive(InputValue value)
 		{
+			if (isInUiRange)
+			{
+				if (isUsingUi) diving = true;
+				isUsingUi = true;
+				return;
+			}
 			DiveInput(value.isPressed);
 		}
 		public void OnLook(InputValue value)
