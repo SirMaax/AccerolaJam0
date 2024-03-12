@@ -6,7 +6,7 @@ public class ToxicSlime : Obstacle
 {
     [SerializeField] private float timeToBecomeActive;
     [SerializeField] private float scaleFactor = 1.1f;
-    
+    [SerializeField] private float deathTime = 10;
     // Start is called before the first frame update
     void Start()
     {
@@ -34,11 +34,27 @@ public class ToxicSlime : Obstacle
             transform.localScale = scale;
         }
         gameObject.GetComponent<SphereCollider>().enabled = true;
+
+        yield return new WaitForSeconds(deathTime);
+        time = 0;
+        while (time <= timeToBecomeActive)
+        {
+            yield return new WaitForSeconds(0.1f);
+            time += 0.1f;
+            Vector3 scale = transform.localScale;
+            scale.x /= scaleFactor;
+            scale.z /= scaleFactor;
+            // scale.y *= scaleFactor / 2;
+            scale.y /= 1.01f;
+            transform.localScale = scale;
+        }
+        Destroy(gameObject);
     }
      
     protected override void ExecuteOnTriggEnter(GameObject collision)
     {
-        Debug.LogError("Health not active");
+        // Debug.LogError("Health not active");
+        GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>().ResetPlayerToBeforeGates();
         // collision.gameObject.transform.parent.GetComponentInChildren<Health>().TakeDamage();
     }
 }

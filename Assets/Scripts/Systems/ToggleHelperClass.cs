@@ -11,6 +11,7 @@ public class ToggleHelperClass : MonoBehaviour
     public bool applyButton = false;
     [SerializeField]private float moveDownHeight;
     private int id;
+    private bool movedDown = true;
     
     [Header("Apperances")]
     [SerializeField] private CorruptAbilities.ECorruptedAbilities list;
@@ -20,6 +21,7 @@ public class ToggleHelperClass : MonoBehaviour
     private ProgressSystem _progress;
     private GameObject selectionBorder;
     private GameObject checkMark;
+    private GameObject explanation;
     
     // Start is called before the first frame update
     void Start()
@@ -30,11 +32,13 @@ public class ToggleHelperClass : MonoBehaviour
         id = (int)list;
         selectionBorder = transform.GetChild(0).gameObject;
         checkMark = transform.GetChild(1).GameObject();
+        explanation = transform.GetChild(3).gameObject;
+        movedDown = false;
     }
     
-    public void ToggleButton()
+    public void ToggleButton(bool overide = false)
     {
-        if (canBeToggeld) return;
+        if (!canBeToggeld) return;
         if (applyButton)
         {
             // _progress.EnableHeatModifieres();
@@ -42,23 +46,34 @@ public class ToggleHelperClass : MonoBehaviour
             _progress.SetText(false);
             return;
         }
+
+        if (overide)
+        {
+            _progress.SetStatusOfHeat(true, id);
+            checkMark.SetActive(true);
+            return;
+        }
         _progress.SetStatusOfHeat(toggle.isOn, id);
         checkMark.SetActive(!checkMark.activeSelf);
+        _progress.SetCurrentHeatText();
     }
 
     public void ButtonSelected()
     {
         selectionBorder.SetActive(true);
+        if(!applyButton)explanation.SetActive(true);
     }
     
     public void ButtonDeSelect()
     {
         selectionBorder.SetActive(false);
+        explanation.SetActive(false);
     }
 
     public void MoveDown()
     {
         transform.transform.Translate(Vector3.down * moveDownHeight);
+        movedDown = true;
     }
 
     public void MoveUp()
@@ -68,9 +83,12 @@ public class ToggleHelperClass : MonoBehaviour
 
     public void ResetHeight()
     {
-        Vector3 pos = transform.position;
-        pos.y = startHeight;
-        transform.position = pos;
+        if (!movedDown) return;
+        movedDown = false;
+        MoveUp();
+        // Vector3 pos = transform.position;
+        // pos.y = startHeight +;
+        // transform.position = pos;
     }
     
 }

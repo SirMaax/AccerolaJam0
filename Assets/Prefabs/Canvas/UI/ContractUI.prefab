@@ -762,6 +762,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tag: 1
+  hoverSpeed: 0
+  distanceUpAndDown: 0
+  speedFollowPlayer: 0
   amountPerPage: 5
   InteractionSign: {fileID: 6189917660593026276}
   _input: {fileID: 0}
@@ -934,7 +937,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -6.436883, y: -9.272736}
+  m_AnchoredPosition: {x: -6.4368896, y: -9.272736}
   m_SizeDelta: {x: 1100, y: 619.0001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &6189917662013564482
@@ -1046,10 +1049,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6189917662125538402}
     m_Modifications:
+    - target: {fileID: 8338206928358300630, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
       propertyPath: applyButton
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: canBeToggeld
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
@@ -1192,6 +1210,11 @@ PrefabInstance:
         type: 3}
       propertyPath: list
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
@@ -1339,6 +1362,11 @@ PrefabInstance:
         type: 3}
       propertyPath: list
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
@@ -1491,6 +1519,11 @@ PrefabInstance:
         type: 3}
       propertyPath: list
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
@@ -1793,6 +1826,11 @@ PrefabInstance:
       propertyPath: list
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
       propertyPath: m_Pivot.x
@@ -1934,6 +1972,11 @@ PrefabInstance:
         type: 3}
       propertyPath: list
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
@@ -2081,6 +2124,11 @@ PrefabInstance:
         type: 3}
       propertyPath: list
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}
@@ -2230,6 +2278,11 @@ PrefabInstance:
         type: 3}
       propertyPath: list
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8338206930236736800, guid: 6a9362601647e6e498077f163cd11282,
+        type: 3}
+      propertyPath: moveDownHeight
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8338206930236736802, guid: 6a9362601647e6e498077f163cd11282,
         type: 3}

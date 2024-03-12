@@ -420,11 +420,15 @@ namespace StarterAssets
             }
             else if (!Grounded && (lastJumpType == 0 || lastJumpType == 2 ))
             {
-                if (_input.move != Vector2.zero)
+                if (!usedDoubleJump || !_corruptAbilities.DoubleJump())
                 {
-                    //If jumpDirection = Vector3.zero mehr lerpValue
-                    jumpDirection.x  = Mathf.Lerp(jumpDirection.x, targetDirection.x, lerpValueForAirControl);
-                    jumpDirection.z  = Mathf.Lerp(jumpDirection.z, targetDirection.z, lerpValueForAirControl);
+                    if (_input.move != Vector2.zero)
+                    {
+                        //If jumpDirection = Vector3.zero mehr lerpValue
+                        jumpDirection.x = Mathf.Lerp(jumpDirection.x, targetDirection.x, lerpValueForAirControl);
+                        jumpDirection.z = Mathf.Lerp(jumpDirection.z, targetDirection.z, lerpValueForAirControl);
+                }
+                    
                 }
                 float jumpSpeedMulti = velocity < 6 ? jumpSpeedMultiplier[currentJumpIndex] : 1;
                 //For slow jumps 

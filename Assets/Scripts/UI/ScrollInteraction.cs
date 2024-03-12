@@ -130,17 +130,21 @@ public class ScrollInteraction : Obstacle
     {
         //Reset height from other buttons before
         ResetHeightOfAllButtons();
-        for (int i = currentIndex % amountPerPage; i < amountPerPage; i++)
+        if (currentIndex == 4 || (currentPage == 0 && currentIndex == 0)) return;
+        for (int i = (currentIndex + 1) % amountPerPage; i < amountPerPage; i++)
         {
-            toggleButtons[currentIndex].MoveDown();
+            
+            toggleButtons[i + (currentPage * amountPerPage)].MoveDown();
         }
     }
 
     private void ResetHeightOfAllButtons()
     {
-        foreach (var button in toggleButtons)
+        for (int i = 0; i < toggleButtons.Count; i++)
         {
-            button.ResetHeight();
+            // if (i == currentIndex) continue;
+            toggleButtons[i].ResetHeight();
         }
+        
     }
 }

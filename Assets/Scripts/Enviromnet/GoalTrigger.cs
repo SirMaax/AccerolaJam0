@@ -39,8 +39,13 @@ public class GoalTrigger : MonoBehaviour
         wasTriggered = true;
         respawnPoint = other.transform;
         bool overrideRespawn = goalID == 0;
-        _checkPointManager.CrossedFinishLine(goalID,respawnPoint,timeSave,overrideRespawn);
-        if (teleportPoint != Vector3.zero)other.transform.parent.GetComponentInChildren<ThirdPersonController>().Teleport(teleportPoint);
+        ProgressSystem pro = GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>();
+        _checkPointManager.CrossedFinishLine(goalID, respawnPoint, timeSave, overrideRespawn);
+        if (pro.GetCurrentSection() == goalID - 1)
+        {
+            if (teleportPoint != Vector3.zero)other.transform.parent.GetComponentInChildren<ThirdPersonController>().Teleport(teleportPoint);
+            
+        }
     }
 
     public void Reset()

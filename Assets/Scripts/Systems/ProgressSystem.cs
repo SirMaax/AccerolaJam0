@@ -27,6 +27,7 @@ public class ProgressSystem : MonoBehaviour
     [SerializeField]private List<float> timeRequirements;
     [SerializeField]private List<int> heatRequirements;
     [SerializeField] private List<int> mainSections;
+    [SerializeField] private List<ToggleHelperClass> requiredAbberation;
     
     [Header("GameObjects")] 
     [SerializeField] private List<bool> loadUpNewLevel;
@@ -60,18 +61,21 @@ public class ProgressSystem : MonoBehaviour
         amountModifiers = _corruptAbilities.isCorrupted.Count;
         
         timeGates = GameObject.FindGameObjectsWithTag("Gate").ToList();
+        heatText.enabled = true;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!heatText.enabled) heatText.enabled = true;
     }
 
     
     
     public bool CanPlayerProgress()
     {
-        return timer.timeForCurrentSection[currentSection][heatRequirements[currentSection]] <= timeRequirements[currentSection] &&
+        float tempTime = timer.timeForCurrentSection[currentSection][heatRequirements[currentSection]]; 
+        return tempTime <= timeRequirements[currentSection] &&
                 currentHeat >= heatRequirements[currentSection];
     }
 
@@ -103,8 +107,8 @@ public class ProgressSystem : MonoBehaviour
     public void SetText(bool success)
     {
         EnableHeatModifieres();
-        heatText.SetText("Heat " + currentHeat.ToString());
-
+        SetCurrentHeatText();
+        
         float time = timer.GetTimeForHeatAndSectionFloat(currentSection, currentHeat);
         if(time == 0) timeText.SetText("No completion time");
         else timeText.SetText(TimeSpan.FromSeconds(time).ToString());
@@ -141,6 +145,7 @@ public class ProgressSystem : MonoBehaviour
         LoadNextSection();
         ShowNextStartText();
         SetText(true);
+        SetRequiredAbberationForCurrent();
         ResetGates();
         timer.Reset();
     }
@@ -151,6 +156,7 @@ public class ProgressSystem : MonoBehaviour
         if (CanPlayerProgress())
         {
             ShowTextForSection();
+            SetRequiredAbberationForCurrent();
             LoadNextSection();
             ShowNextStartText();
             SetText(true);
@@ -162,6 +168,7 @@ public class ProgressSystem : MonoBehaviour
         }
 
         ResetGates();
+        _corruptAbilities.Reset();
         timer.Reset();
     }
 
@@ -177,13 +184,14 @@ public class ProgressSystem : MonoBehaviour
 
     private void ShowFailTextForCurrentSection()
     {
+        texts[currentSection-1].SetActive(false);
         failTexts[currentSection].SetActive(true);
     }
 
     private void ShowNextStartText()
     {
-        startTexts[currentSection-1].SetActive(false);
-        startTexts[currentSection].SetActive(true);
+        if(startTexts[currentSection-1]!=null)startTexts[currentSection-1].SetActive(false);
+        if (startTexts[currentSection] != null)startTexts[currentSection].SetActive(true);
     }
 
     private void ResetGates()
@@ -198,6 +206,7 @@ public class ProgressSystem : MonoBehaviour
     {
         ResetGates();
         timer.Reset();
+        _corruptAbilities.Reset();
         GameObject.FindWithTag("Player").transform.parent.GetComponentInChildren<ThirdPersonController>().Teleport(beforeGateCoord.position);
     }
     
@@ -209,6 +218,25 @@ public class ProgressSystem : MonoBehaviour
     public void ApplyAbberationEffect()
     {
         _corruptAbilities.abilitiesAreOverRidden = true;
+    }
+
+    public void DisableAbberationEffect()
+    {
+        _corruptAbilities.abilitiesAreOverRidden = false;
+    }
+    
+    public void SetRequiredAbberationForCurrent()
+    {
+        if (requiredAbberation[currentSection] == null) return;
+        requiredAbberation[currentSection].ToggleButton();
+        requiredAbberation[currentSection].canBeToggeld = false;
+    }
+
+    public void SetCurrentHeatText()
+    {
+        EnableHeatModifieres();
+        heatText.SetText("Abberation score: " + currentHeat.ToString());
+
     }
     
 }

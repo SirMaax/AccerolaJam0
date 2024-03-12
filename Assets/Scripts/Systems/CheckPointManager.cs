@@ -38,7 +38,10 @@ public class CheckPointManager : MonoBehaviour
         if (_progressSystem.GetCurrentSection() != goalID-1) return;
         timer.StopTimer();
         timeSaves.Add(timeSave);
+        _progressSystem.DisableAbberationEffect();
         currentCheckPoint = -1;
+        return;
+        
     }
     public Vector3 GetRespawnPosition()
     {

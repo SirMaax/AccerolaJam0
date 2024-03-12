@@ -43,6 +43,7 @@ public class CorruptAbilities : MonoBehaviour
 
     public enum ECorruptedAbilities
     {
+        removeGround,
         baseJump,
         doubleJump,
         diveLimitUse,
@@ -172,5 +173,17 @@ public class CorruptAbilities : MonoBehaviour
         if (!abilitiesAreOverRidden) return 1;
         if (!isCorrupted[(int)ECorruptedAbilities.backFlip]) return 1;
         return 2;
+    }
+
+    public void Reset()
+    {
+        timesUsed = 0;
+        usedWalls.Clear();
+    }
+
+    public bool DoubleJump()
+    {
+        if (!isCorrupted[(int)ECorruptedAbilities.doubleJump]) return false;
+        return true;
     }
 }
