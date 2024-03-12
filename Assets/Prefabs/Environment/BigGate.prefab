@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 8644829818034761267}
   m_Layer: 11
   m_Name: Hitbox
-  m_TagString: Untagged
+  m_TagString: Gate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -160,3 +160,5 @@ MonoBehaviour:
   _typeGoal: 0
   timeSave: 0
   goalID: 0
+  teleportPoint: {x: 0, y: 0, z: 0}
+  canBeTriggeredMoreThanOnce: 0

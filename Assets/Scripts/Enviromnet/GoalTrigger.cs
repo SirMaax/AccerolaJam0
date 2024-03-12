@@ -38,7 +38,13 @@ public class GoalTrigger : MonoBehaviour
         if (!other.gameObject.tag.Equals("PlayerTrigger") || (wasTriggered && !canBeTriggeredMoreThanOnce)) return;
         wasTriggered = true;
         respawnPoint = other.transform;
-        _checkPointManager.CrossedFinishLine(goalID,respawnPoint,timeSave);
+        bool overrideRespawn = goalID == 0;
+        _checkPointManager.CrossedFinishLine(goalID,respawnPoint,timeSave,overrideRespawn);
         if (teleportPoint != Vector3.zero)other.transform.parent.GetComponentInChildren<ThirdPersonController>().Teleport(teleportPoint);
+    }
+
+    public void Reset()
+    {
+        wasTriggered = false;
     }
 }

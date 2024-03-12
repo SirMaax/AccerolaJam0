@@ -75,6 +75,11 @@ namespace StarterAssets
 			}
 		}
 
+		public void OnReset(InputValue value)
+		{
+			if(value.isPressed)GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>().ResetPlayerToBeforeGates();
+		}
+		
 		public void OnJump(InputValue value)
 		{
 			JumpInput(value.isPressed);

@@ -10,6 +10,7 @@ TagManager:
   - CheckPointManager
   - ProgressSystem
   - Timer
+  - Gate
   layers:
   - Default
   - TransparentFX

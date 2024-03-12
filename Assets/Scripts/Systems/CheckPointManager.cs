@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,24 +13,32 @@ public class CheckPointManager : MonoBehaviour
     private List<float> times;
     private List<float> timeSaves;
 
-    [Header("References")] private Timer timer;
+    [Header("References")] 
+    private Timer timer;
+    private ProgressSystem _progressSystem;
     // Start is called before the first frame update
     void Start()
     {
         times = new List<float>();
         timeSaves = new List<float>();
         timer = GameObject.FindWithTag("Timer").GetComponent<Timer>();
+        _progressSystem = GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>();
     }
 
-    public void CrossedFinishLine(int goalID, Transform respawnPoint,float timeSave)
+
+
+    public void CrossedFinishLine(int goalID, Transform respawnPoint,float timeSave, bool overrideTeleport = false)
     {
+        if (overrideTeleport) currentRespawnPoint = respawnPoint.position;
         if (goalID <= currentCheckPoint) return;
         currentRespawnPoint = respawnPoint.position;
         currentCheckPoint = goalID;
-        timer.StopTimer();
-        times.Add(Time.time); 
-        timeSaves.Add(timeSave);
         Debug.Log(currentRespawnPoint);
+
+        if (_progressSystem.GetCurrentSection() != goalID-1) return;
+        timer.StopTimer();
+        timeSaves.Add(timeSave);
+        currentCheckPoint = -1;
     }
     public Vector3 GetRespawnPosition()
     {
@@ -39,6 +48,7 @@ public class CheckPointManager : MonoBehaviour
     public void FirstCheckPoint()
     {
         timer.StartTimer();
-        
+        _progressSystem.ApplyAbberationEffect();
     }
+
 }

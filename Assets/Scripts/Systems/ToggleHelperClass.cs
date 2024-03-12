@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class ToggleHelperClass : MonoBehaviour
 {
     [Header("Settings")] 
+    public bool canBeToggeld = true;
     public bool applyButton = false;
     [SerializeField]private float moveDownHeight;
     private int id;
@@ -33,11 +34,12 @@ public class ToggleHelperClass : MonoBehaviour
     
     public void ToggleButton()
     {
+        if (canBeToggeld) return;
         if (applyButton)
         {
             // _progress.EnableHeatModifieres();
             ButtonDeSelect();
-            _progress.SetText();
+            _progress.SetText(false);
             return;
         }
         _progress.SetStatusOfHeat(toggle.isOn, id);
