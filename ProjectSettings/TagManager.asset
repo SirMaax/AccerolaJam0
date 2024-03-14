@@ -11,6 +11,8 @@ TagManager:
   - ProgressSystem
   - Timer
   - Gate
+  - Medal
+  - PlayerSound
   layers:
   - Default
   - TransparentFX

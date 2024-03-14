@@ -12,7 +12,7 @@ public class ToggleHelperClass : MonoBehaviour
     [SerializeField]private float moveDownHeight;
     private int id;
     private bool movedDown = true;
-    
+    private bool active;
     [Header("Apperances")]
     [SerializeField] private CorruptAbilities.ECorruptedAbilities list;
 
@@ -47,13 +47,14 @@ public class ToggleHelperClass : MonoBehaviour
             return;
         }
 
+        active = !active;
         if (overide)
         {
             _progress.SetStatusOfHeat(true, id);
             checkMark.SetActive(true);
             return;
         }
-        _progress.SetStatusOfHeat(toggle.isOn, id);
+        _progress.SetStatusOfHeat(active, id);
         checkMark.SetActive(!checkMark.activeSelf);
         _progress.SetCurrentHeatText();
     }

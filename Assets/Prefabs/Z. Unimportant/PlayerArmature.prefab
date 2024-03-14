@@ -1613,9 +1613,12 @@ MonoBehaviour:
   overwriteOfNormalMovementPeriod: 1
   wallJumpMultiplier: 2
   touchedWall: {fileID: 0}
+  lerpValueWallJump: 0
   onWall: 0
+  wallJump: 0
   entryVector: {x: 0, y: 0, z: 0}
   divingSpeed: 15
+  diveGravity: 0
   backFlipHeight: 0
   backFlipDuration: 1
   backFlipBackwardsMovement: 0
@@ -1631,7 +1634,7 @@ MonoBehaviour:
   BottomClamp: -30
   CameraAngleOverride: 0
   LockCameraPosition: 0
-  gx: {fileID: 9013375372187657931}
+  gx: {fileID: 5212898283533322988}
   _controller: {fileID: 0}
 --- !u!114 &7313554888198478620
 MonoBehaviour:
@@ -1645,9 +1648,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0359344b1da4d924ca3eaa91e256a5c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  abilitiesAreOverRidden: 0
   list: 0
   isCorrupted: 
+  tutorial: 0
   maxTimeUseable: 0
+  wallWasUsedMaterial: {fileID: 0}
   speedAtWhichCorruptIsTriggered: 0
   spawnInterval: 0
   minCorruptDuration: 0
@@ -1680,6 +1686,8 @@ MonoBehaviour:
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
+  isInUiRange: 0
+  isUsingUi: 0
 --- !u!114 &4636987961440718552
 MonoBehaviour:
   m_ObjectHideFlags: 0

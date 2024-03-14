@@ -16,6 +16,11 @@ public class SoundManager : MonoBehaviour
     {
         abilityWasBlockedDueToCorrupt,
         flipPanelClockSound,
+        jump,
+        dive,
+        backgroundMusic,
+        backgroundNoise,
+        
     }
     
     private void Start()
@@ -46,7 +51,7 @@ public class SoundManager : MonoBehaviour
     {
         if (disableAllAudio) return null;
         int index = (int)clip;
-        if (index < effectSource.Length)
+        if (index > effectSource.Length)
         {
             Debug.LogError("Audio sound missing for "+ index);
             return null;

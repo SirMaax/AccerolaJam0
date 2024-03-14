@@ -2,22 +2,30 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using StarterAssets;
+using TMPro;
 using UnityEngine;
 
 public class CorruptAbilities : MonoBehaviour
 {
+    [Header("Testoverride")]
+    [SerializeField] public bool test;
+    
     [Header("Corrupted Abilities")] 
     public bool abilitiesAreOverRidden;
+    public static bool globalAbilitiesAreOverRidden;
     [SerializeField] private ECorruptedAbilities list;
     public List<bool> isCorrupted;
-
+    [SerializeField] private bool tutorial = false;
     [Header("Dive")] 
+    [SerializeField] private TMP_Text remaningDive;
     [SerializeField] private int maxTimeUseable;
     private int timesUsed;
 
     [Header("Wall Jump")] 
     private List<GameObject> usedWalls;
-
+    [SerializeField] private Material wallWasUsedMaterial;
+    private Material baseWallMaterial;
+    
     [Header("Movement")] 
     [SerializeField] private float speedAtWhichCorruptIsTriggered;
     [SerializeField] private float spawnInterval;
@@ -33,7 +41,8 @@ public class CorruptAbilities : MonoBehaviour
     [SerializeField]private double decayFactor = 0.9f;
     private int jumpComboTimesUsed= 0;
 
-    
+    [Header("Moving Stage")] 
+    public static bool movingStageCorruption;
     
     [Header("References")]
     //Hierarchy needs to stay the same
@@ -51,6 +60,7 @@ public class CorruptAbilities : MonoBehaviour
         movement,
         jumpCombo,
         backFlip,
+        movingStage,
     }
     
     
@@ -67,7 +77,21 @@ public class CorruptAbilities : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isCorrupted[(int)ECorruptedAbilities.movingStage])
+        {
+            movingStageCorruption = true;
+        }
+        else movingStageCorruption = false;
         
+        if (test)
+        {
+            globalAbilitiesAreOverRidden = true;
+            abilitiesAreOverRidden = true;
+        }
+        globalAbilitiesAreOverRidden = abilitiesAreOverRidden;
+        if (remaningDive == null) return;
+        if (isCorrupted[(int)ECorruptedAbilities.diveLimitUse]) remaningDive.enabled = true;
+        else remaningDive.enabled = false;
     }
     /// <summary>
     /// This jump is supposed to work when the player is jumping to the left, right or backwards
@@ -80,12 +104,13 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>Returns true if corrupt logic is working right now </returns>
     public bool CorruptJump()
     {
+        if (tutorial) return false;
         if (!abilitiesAreOverRidden) return false;
         bool result = false;
         if (!isCorrupted[(int)ECorruptedAbilities.baseJump]) return false;
         if (_input.move.y > 0) result = true;
 
-        if (result) _soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
+        // if (result) _soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
 
 
         return result;
@@ -96,15 +121,18 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>Yes if was used to often and cant be used further</returns>
     public bool CorruptDive()
     {
+        if (tutorial) return false;
         if (!abilitiesAreOverRidden) return false;
         if (!isCorrupted[(int)ECorruptedAbilities.diveLimitUse]) return false;
+        
         if (timesUsed >= maxTimeUseable)
         {
             _soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
             return true;
         }
         timesUsed += 1;
-
+        remaningDive.SetText("Remaning dives" + (maxTimeUseable - timesUsed).ToString());
+        
         return false;
     }
     /// <summary>
@@ -114,14 +142,17 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns></returns>
     public bool WallJump(GameObject wall)
     {
+        if (tutorial) return false;
         if (!abilitiesAreOverRidden) return false;
         if (!isCorrupted[(int)ECorruptedAbilities.wallJump]) return false;
+        if (baseWallMaterial == null) baseWallMaterial = wall.GetComponent<Renderer>().material;
         if (usedWalls.Contains(wall))
         {
             _soundManager.Play(SoundManager.EAudioClips.abilityWasBlockedDueToCorrupt);
             return true;
         }
         usedWalls.Add(wall);
+        wall.GetComponent<Renderer>().material = wallWasUsedMaterial;
         //Apply Effect to wall
         return false;
     }
@@ -133,6 +164,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <param name="speed"></param>
     public void CorruptedMovement(float speed, bool grounded)
     {
+        if (tutorial) return;
         if (!abilitiesAreOverRidden) return;
         if (!isCorrupted[(int)ECorruptedAbilities.movement]) return;
         if (speed >= speedAtWhichCorruptIsTriggered && grounded)
@@ -158,6 +190,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>1 if nothing is changed else the jumpower for the jump</returns>
     public float JumpCombo(int currentJumpIndex)
     {
+        if (tutorial) return 1;
         if (!abilitiesAreOverRidden) return 1;
         if (!isCorrupted[(int)ECorruptedAbilities.jumpCombo]) return 1;
         if(currentJumpIndex == 2) timesUsed += 1;
@@ -170,6 +203,7 @@ public class CorruptAbilities : MonoBehaviour
     /// <returns>a time of 1 for no corruption. A time of 2 seconds for corruption</returns>
     public float BackFlip()
     {
+        if (tutorial) return 1;
         if (!abilitiesAreOverRidden) return 1;
         if (!isCorrupted[(int)ECorruptedAbilities.backFlip]) return 1;
         return 2;
@@ -177,13 +211,32 @@ public class CorruptAbilities : MonoBehaviour
 
     public void Reset()
     {
+        GameObject.FindWithTag("PlayerSound").GetComponent<LocalSoundManager>().Pause(SoundManager.EAudioClips.backgroundMusic);
         timesUsed = 0;
+        foreach (var wall in usedWalls)
+        {
+            wall.GetComponent<Renderer>().material = baseWallMaterial;
+        }
         usedWalls.Clear();
+        abilitiesAreOverRidden = false;
+        foreach (Transform child in folderForToxicTrails.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     public bool DoubleJump()
     {
+        if (!abilitiesAreOverRidden) return false;
         if (!isCorrupted[(int)ECorruptedAbilities.doubleJump]) return false;
         return true;
+    }
+
+    public void ResetSlime()
+    {
+        foreach (Transform child in folderForToxicTrails.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }

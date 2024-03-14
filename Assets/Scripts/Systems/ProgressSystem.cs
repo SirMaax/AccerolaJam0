@@ -9,6 +9,9 @@ using UnityEngine;
 public class ProgressSystem : MonoBehaviour
 {
     [Header("Test")] [SerializeField] private int test;
+
+    [Header("ProgressItem")] 
+    [SerializeField]private GameObject progress;
     
     [Header("Progression")] 
     public int currentSection;
@@ -87,6 +90,8 @@ public class ProgressSystem : MonoBehaviour
         if(loadUpNewLevel[currentSection])sectionParts[currentSection].SetActive(true);
         if(removeParts[currentSection]!=null)removeParts[currentSection].SetActive(false);
         if(additionalHeat.Count > currentSection && additionalHeat[currentSection]!= null)additionalHeat[currentHeat].SetActive(true);
+        timeGates.Clear();
+        timeGates = GameObject.FindGameObjectsWithTag("Gate").ToList();
     }
     
     public void SetStatusOfHeat(bool status, int id)
@@ -101,7 +106,8 @@ public class ProgressSystem : MonoBehaviour
         {
             currentHeat += ability ? 1 : 0;
         }
-        
+        if(currentSection!= 0)failTexts[currentSection-1].SetActive(false);
+        failTexts[currentSection].SetActive(false);
     }
 
     public void SetText(bool success)
@@ -115,9 +121,9 @@ public class ProgressSystem : MonoBehaviour
         if (currentSection>0)
         {
             lastRequiredTimeText.SetText("Time: " + Timer.GetTimeString(timeRequirements[currentSection-1]));
-            lastrequiredHeatText.SetText("Heat:" + heatRequirements[currentSection-1]);
+            lastrequiredHeatText.SetText("Abberation:" + heatRequirements[currentSection-1]);
         }
-        requiredHeatText.SetText("Heat: " + heatRequirements[currentSection]);
+        requiredHeatText.SetText("Abberation: " + heatRequirements[currentSection]);
         requiredTimeText.SetText("Time: " + Timer.GetTimeString(timeRequirements[currentSection]));
 
     }
@@ -134,7 +140,7 @@ public class ProgressSystem : MonoBehaviour
 
     public int GetMaxPossibleHeat()
     {
-        return _corruptAbilities.isCorrupted.Count;
+        return _corruptAbilities.isCorrupted.Count + 1;
     }
     
     [ContextMenu("Set Stage to TEST")]
@@ -155,21 +161,28 @@ public class ProgressSystem : MonoBehaviour
 
         if (CanPlayerProgress())
         {
-            ShowTextForSection();
-            SetRequiredAbberationForCurrent();
-            LoadNextSection();
-            ShowNextStartText();
-            SetText(true);
+            ShowProgressStage();
         }
         else
         {
             ShowFailTextForCurrentSection();
             SetText(false);
         }
-
+        GameObject.FindWithTag("Medal").GetComponent<MedalSystem>().SetMedal(timer.currentTimer);
         ResetGates();
         _corruptAbilities.Reset();
         timer.Reset();
+    }
+
+    public void ProgressStage()
+    {
+        ShowTextForSection();
+        SetRequiredAbberationForCurrent();
+        LoadNextSection();
+        ShowNextStartText();
+        SetText(true);
+        progress.SetActive(false);
+        GameObject.FindWithTag("Medal").GetComponent<MedalSystem>().ResetMedal();
     }
 
     private void ShowTextForSection()
@@ -235,8 +248,17 @@ public class ProgressSystem : MonoBehaviour
     public void SetCurrentHeatText()
     {
         EnableHeatModifieres();
-        heatText.SetText("Abberation score: " + currentHeat.ToString());
+        heatText.SetText("Aberration score: " + currentHeat.ToString());
 
     }
-    
+
+    private void ShowProgressStage()
+    {
+        progress.SetActive(true);
+    }
+
+    public void ResetSlime()
+    {
+        _corruptAbilities.ResetSlime();
+    }
 }

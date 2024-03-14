@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 97f0f0bc866943943affc0933660dca4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -111,5 +111,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tag: 1
+  hoverSpeed: 0
+  distanceUpAndDown: 0
+  speedFollowPlayer: 0
   timeToBecomeActive: 1
   scaleFactor: 1.2
+  deathTime: 3.5

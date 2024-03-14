@@ -12,7 +12,7 @@ public class ScrollInteraction : Obstacle
     private int currentIndex = 0;
     private int currentPage = 0;
     private bool firstTime = true;
-    
+    private bool isInRange = false;
     [Header("References")]
     [SerializeField] private GameObject InteractionSign;
     [SerializeField] private StarterAssetsInputs _input;
@@ -27,10 +27,18 @@ public class ScrollInteraction : Obstacle
             pages.SetActive(false);
         }
         page[0].SetActive(true);
+        GetComponent<BoxCollider>().enabled = false;
+
     }
 
     void Update()
     {
+        
+        if (ProgressSystem.CURRENT_SECTION == 2)
+        {
+            GetComponent<BoxCollider>().enabled = true;
+        }
+        if (!isInRange) return;
         if (!_input.isUsingUi)
         {
             firstTime = true;
@@ -59,12 +67,14 @@ public class ScrollInteraction : Obstacle
         Debug.Log("Player enters");
         SetDisplayInteractionStatus(true);
         _input.isInUiRange = true;
+        isInRange = true;
     }
 
     protected override void ExecuteOnTriggLeave()
     {
         SetDisplayInteractionStatus(false);
         _input.isInUiRange = false;
+        isInRange = false;
     }
 
     private void SetDisplayInteractionStatus(bool status)

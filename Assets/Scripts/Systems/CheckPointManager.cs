@@ -26,21 +26,31 @@ public class CheckPointManager : MonoBehaviour
     }
 
 
-
-    public void CrossedFinishLine(int goalID, Transform respawnPoint,float timeSave, bool overrideTeleport = false)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="goalID"></param>
+    /// <param name="respawnPoint"></param>
+    /// <param name="timeSave"></param>
+    /// <param name="overrideTeleport"></param>
+    /// <param name="checkPointGate"></param>
+    /// <returns> If player can be teleported</returns>
+    public bool CrossedFinishLine(int goalID, Transform respawnPoint,float timeSave, bool overrideTeleport = false, bool checkPointGate = false)
     {
+        bool result = true;
         if (overrideTeleport) currentRespawnPoint = respawnPoint.position;
-        if (goalID <= currentCheckPoint) return;
+        if (goalID <= currentCheckPoint)result = false;
         currentRespawnPoint = respawnPoint.position;
-        currentCheckPoint = goalID;
+        if(!checkPointGate)currentCheckPoint = goalID;
         Debug.Log(currentRespawnPoint);
-
-        if (_progressSystem.GetCurrentSection() != goalID-1) return;
-        timer.StopTimer();
+        if (!result) return false;
+        if (_progressSystem.GetCurrentSection() != goalID-1 || checkPointGate) return false;
+        timer.StopTimer(timeSave);
+        
         timeSaves.Add(timeSave);
         _progressSystem.DisableAbberationEffect();
         currentCheckPoint = -1;
-        return;
+        return true;
         
     }
     public Vector3 GetRespawnPosition()
@@ -50,6 +60,7 @@ public class CheckPointManager : MonoBehaviour
 
     public void FirstCheckPoint()
     {
+        GameObject.FindWithTag("PlayerSound").GetComponent<LocalSoundManager>().Play(SoundManager.EAudioClips.backgroundMusic);
         timer.StartTimer();
         _progressSystem.ApplyAbberationEffect();
     }

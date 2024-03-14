@@ -11,9 +11,8 @@ public class Timer : MonoBehaviour
     [Header("Timer")]
     //Time for each section with heat
     public float[][] timeForCurrentSection;
-    private float currentTimer;
-    private bool isTimerRunning;
-
+    public float currentTimer;
+    public static bool isTimerRunning;
     [Header("References")] 
     [SerializeField]private TMP_Text timerText;
     private ProgressSystem _progressSystem;
@@ -28,6 +27,7 @@ public class Timer : MonoBehaviour
             timeForCurrentSection[i] = new float[_progressSystem.GetMaxPossibleHeat()];
         }
         timerText.enabled = false;
+        isTimerRunning = false;
     }
 
     // Update is called once per frame
@@ -53,14 +53,18 @@ public class Timer : MonoBehaviour
     {
         if (isTimerRunning) return;
         isTimerRunning = true;
+        
         _progressSystem.EnableHeatModifieres();
         timerText.enabled = true;
     }
     
-    public void StopTimer()
+    public void StopTimer(float timeSave = 0)
     {
+        GameObject.FindWithTag("PlayerSound").GetComponent<LocalSoundManager>().Pause(SoundManager.EAudioClips.backgroundMusic);
+
         float oldTime = timeForCurrentSection[ProgressSystem.CURRENT_SECTION][_progressSystem.GetCurrentHeat()];
-        if (oldTime == 0 || oldTime > currentTimer) timeForCurrentSection[ProgressSystem.CURRENT_SECTION][_progressSystem.GetCurrentHeat()] = currentTimer;
+        if (oldTime == 0 || oldTime > currentTimer) timeForCurrentSection[ProgressSystem.CURRENT_SECTION][_progressSystem.GetCurrentHeat()] = currentTimer - timeSave;
+        
         isTimerRunning = false;
         timerText.enabled = false;
         _progressSystem.Finished();

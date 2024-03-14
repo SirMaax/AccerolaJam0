@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using StarterAssets;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ToxicSlime : Obstacle
@@ -54,7 +56,12 @@ public class ToxicSlime : Obstacle
     protected override void ExecuteOnTriggEnter(GameObject collision)
     {
         // Debug.LogError("Health not active");
-        GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>().ResetPlayerToBeforeGates();
+        CheckPointManager _checkPointManager = GameObject.FindWithTag("CheckPointManager").GetComponent<CheckPointManager>();
+        collision.transform.parent.GetComponent<ThirdPersonController>().Teleport(_checkPointManager.GetRespawnPosition());
+        ProgressSystem pro = GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>();
+        pro.ResetSlime();
+
+        // GameObject.FindWithTag("ProgressSystem").GetComponent<ProgressSystem>().ResetPlayerToBeforeGates();
         // collision.gameObject.transform.parent.GetComponentInChildren<Health>().TakeDamage();
     }
 }

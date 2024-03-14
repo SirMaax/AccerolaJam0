@@ -18,7 +18,7 @@ public class Flip : Obstacle
     
     //Changes between 1 and -1 
     private int multiplier = 1;
-    private LocalSoundManager _soundManager;
+    [SerializeField]private LocalSoundManager _soundManager;
     // Start is called before the first frame update
 
     private void Awake()
@@ -28,20 +28,21 @@ public class Flip : Obstacle
             transform.Rotate(flipRotation,rotationDegree);
             multiplier *= -1;
         }
-        _soundManager = gameObject.AddComponent<LocalSoundManager>();
     }
 
     IEnumerator Start()
     {
         while (true)
         {
+            yield return new WaitForSeconds(timeSoundPlays);
+            
+            _soundManager.Play(SoundManager.EAudioClips.flipPanelClockSound);
+            yield return new WaitForSeconds(0.4f);
             for (int i = 0; i < rotationDegree; i +=flipSpeed)
             {
                 yield return new WaitForSeconds(timeBetweenSmallFlip);
                 transform.Rotate(flipRotation,flipSpeed * multiplier);
             }
-            yield return new WaitForSeconds(timeSoundPlays);
-            _soundManager.Play(SoundManager.EAudioClips.flipPanelClockSound);
             yield return new WaitForSeconds(flipTime-timeSoundPlays);
             multiplier *= -1;
         }

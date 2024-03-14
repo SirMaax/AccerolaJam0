@@ -2,7 +2,6 @@
  using System.Collections;
  using System.Collections.Generic;
  using Unity.Mathematics;
- using UnityEditor.Experimental.GraphView;
  using UnityEngine;
  using UnityEngine.Animations;
  using UnityEngine.PlayerLoop;
@@ -27,7 +26,7 @@ namespace StarterAssets
         
         [Header("Settings")] 
         [SerializeField] private bool playerIsAlwaysSprinting;
-        [SerializeField] private bool canUseDoubleJump;
+        [SerializeField] private bool canUseDoubleJump = false;
         [SerializeField] private bool canJumpHigherByHolding;
         [SerializeField] private bool canHoldDownSpaceForJumping;
         [SerializeField] bool printOutJumpCombo;
@@ -78,7 +77,7 @@ namespace StarterAssets
         [SerializeField] private float coyoteTime;
         [SerializeField] private float maxJumpButtonHolding;
         [Tooltip("-1 == None/ 0 == Normal Jump/  1 == WallJump/  2 == Double Jump / 3 == Continued Jump / 4 == Other")]
-        private int lastJumpType = 0;
+        public int lastJumpType = -1;
         
         //The last time when the player had his initial jump
         private float timeOffInitialJump = 0;
@@ -387,6 +386,8 @@ namespace StarterAssets
             // if there is a move input rotate player when the player is moving
             if (_input.move != Vector2.zero)
             {
+                if (!isBackFlipping)
+                {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                   _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
@@ -394,6 +395,8 @@ namespace StarterAssets
 
                 // rotate to face input direction relative to camera position
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                    
+                }
             }
             
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
@@ -444,7 +447,7 @@ namespace StarterAssets
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
                 // transform.Translate(outsideMovement);
             }
-            _corruptAbilities.CorruptedMovement(currentHorizontalSpeed,Grounded);
+            if(_input.move != Vector2.zero) _corruptAbilities.CorruptedMovement(currentHorizontalSpeed,Grounded);
             // update animator if using character
             if (_hasAnimator)
             {
@@ -458,8 +461,9 @@ namespace StarterAssets
             // _input.move == Vector2.zero ||
             if ( velocity < requiredAccelerationSpeed && hasFullyAccelerated && !onWall )
             {
-                if(!Grounded)currentAccelerationTime -= Time.deltaTime;
-                else
+                // if(!Grounded)currentAccelerationTime -= Time.deltaTime;
+                if(Grounded)
+                // else
                 {
                     currentAccelerationTime = 0;
                     hasFullyAccelerated = false;
@@ -486,7 +490,7 @@ namespace StarterAssets
                 Jump(jumpType: 2);
             }
             //Double Jump canJump is false after first jump button is released
-             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump && !onWall && !wallJump)
+             else  if (_input.jump && !canJump && !usedDoubleJump && lastJumpType!= -1 && canUseDoubleJump && !onWall && !wallJump && _input.HasReleasedJumpButtonSinceLastJump(lastTimeGrounded))
             {
                 Debug.Log("used double jump");
                 usedDoubleJump = true;
@@ -583,6 +587,7 @@ namespace StarterAssets
                 && initialJump) return;
             if(initialJump)HandleJumpCombo();
             
+            if(jumpType == 0 || jumpType == 1)_soundManager.Play(SoundManager.EAudioClips.jump);
             lastJumpType = jumpType;
             startedJump = true;
             // the square root of H * -2 * G = how much velocity needed to reach desired height
@@ -596,7 +601,9 @@ namespace StarterAssets
             
             float jumpComboMultiplier = jumpMultiplier[currentJumpIndex];
             //Corruption modifier
-            jumpComboMultiplier *= currentJumpIndex > 1 ? _corruptAbilities.JumpCombo(currentJumpIndex) : 1;
+            jumpComboMultiplier *= currentJumpIndex > 1? _corruptAbilities.JumpCombo(currentJumpIndex) : 1;
+            //Jumpcombo multiplier only on normal jump
+            jumpComboMultiplier = jumpType == 0 || jumpType == 3 ? jumpComboMultiplier : 1;
             _verticalVelocity = Mathf.Sqrt(usedJumpHeight * jumpComboMultiplier * -2f * Gravity);
             // update animator if using character
             if (_hasAnimator)
@@ -728,7 +735,11 @@ namespace StarterAssets
         {
             if (_input.diving && CanDive())
             {
-                if (_corruptAbilities.CorruptDive()) return;
+                if (_corruptAbilities.CorruptDive())
+                {
+                    return;
+                }
+                _soundManager.Play(SoundManager.EAudioClips.dive);
                 _input.diving = false;
                 isDiving = true;
                 divingDirection = _input.move;
@@ -819,6 +830,8 @@ namespace StarterAssets
 
         public void Teleport(Vector3 position)
         {
+            
+            _controller.SimpleMove(Vector3.zero);
             _controller.enabled = false;
             transform.position = position;
             Debug.Log(position);

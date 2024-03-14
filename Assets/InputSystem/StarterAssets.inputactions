@@ -258,7 +258,7 @@
                 {
                     "name": "",
                     "id": "c6c5ed69-9f82-4519-a0fb-7adfc77126c5",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -270,6 +270,17 @@
                     "name": "",
                     "id": "88b353df-bb4f-4d9d-918e-f37430c45e64",
                     "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dive",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cd763e40-9f48-4092-803e-0cb17ee70a4d",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
